@@ -1,8 +1,9 @@
 from django.shortcuts import render
-from.forms import UserForm
+from.forms import UserForm, UserLoginForm
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import authenticate,  login, logout
 
 def regist(request):
     user_form = UserForm(request.POST or None)
@@ -18,8 +19,22 @@ def regist(request):
             })
         user.set_password(password)
         user.save()
-        
-        
     return render(request, 'user/registration.html', context={
         'user_form' : user_form,
     })
+
+def login_view(request):
+    login_form = UserLoginForm(request.POST or None)
+    if login_form.is_valid():
+        username = login_form.cleaned_data.get('username')
+        password = login_form.cleaned_data.get('password1')
+        #認証処理(成功したらuserが返される)
+        user = authenticate(request, username=username, password=password)
+        if user is not None and user.is_authenticated:
+            login(request, user)#ログイン処理
+        else:
+            login_form.add_error('username', '認証に失敗しました')
+    return render(request, 'user/login.html', context={
+        'login_form': login_form,
+    })
+    
