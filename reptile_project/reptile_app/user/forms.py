@@ -27,3 +27,16 @@ class UserLoginForm(forms.Form):
         if password1 != password2:
             raise ValueError('パスワードが一致しません')
         return cleaned_data
+
+class RequestPasswordResetForm(forms.Form):
+    email = forms.EmailField(
+        label='メールアドレス',
+        widget=forms.EmailInput()        
+    )
+    
+    def clean_email(self):
+        email = self.changed_data['email']
+        if not User.objects.filter(email=email).exists():
+            raise ValidationError('このメールアドレスのユーザーは存在しません')
+        return email
+    
