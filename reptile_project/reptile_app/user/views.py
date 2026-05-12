@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from.forms import UserForm, UserLoginForm, RequestPasswordResetForm, SetNewPasswordForm
-from.models import PsaawordResetToken
+from.models import PasswordResetToken
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import UserCreationForm
@@ -65,7 +65,7 @@ def request_password_reset(request):
         email = form.cleaned_data['email']
         user = get_object_or_404(User, email=email)
         #新しいトークンを作成
-        password_reset_token, created = PsaawordResetToken.objects.get_or_create(user=user)
+        password_reset_token, created = PasswordResetToken.objects.get_or_create(user=user)
         if not created:
             password_reset_token.token = uuid.uuid4()
             password_reset_token.used = False
@@ -81,7 +81,7 @@ def request_password_reset(request):
     
 def reset_password(request, token):
     password_reset_token = get_object_or_404(
-        PsaawordResetToken,
+        PasswordResetToken,
         token=token,
         used=False,
     )

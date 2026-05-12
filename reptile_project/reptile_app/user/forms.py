@@ -10,7 +10,7 @@ class UserForm(forms.ModelForm):
         widgets = {
             'password': forms.PasswordInput
         }
-        
+
 class UserLoginForm(forms.Form):
     username = forms.CharField(label='ユーザー名', max_length=255)
     password1 = forms.CharField(
@@ -19,19 +19,19 @@ class UserLoginForm(forms.Form):
     password2 = forms.CharField(
         label='パスワード(再)', max_length=50, widget=forms.PasswordInput
     )
-        
+
     def clean(self):
         cleaned_data = super().clean()
         password1 = cleaned_data.get('password1')
         password2 = cleaned_data.get('password2')
         if password1 != password2:
-            raise ValueError('パスワードが一致しません')
+            raise ValidationError('パスワードが一致しません')
         return cleaned_data
 
 class RequestPasswordResetForm(forms.Form):
     email = forms.EmailField(
         label='メールアドレス',
-        widget=forms.EmailInput()        
+        widget=forms.EmailInput()    
     )
     
     def clean_email(self):
