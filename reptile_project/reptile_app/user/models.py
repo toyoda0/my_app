@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 import uuid
 
 #パスワード再発行
-class PsaawordResetToken(models.Model):
+class PasswordResetToken(models.Model):
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
