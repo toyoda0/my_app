@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from.forms import UserForm, UserLoginForm, RequestPasswordResetForm
+from.forms import UserForm, UserLoginForm, RequestPasswordResetForm, SetNewPasswordForm
 from.models import PsaawordResetToken
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
@@ -60,8 +60,9 @@ def info(request):
 
 def request_password_reset(request):
     form = RequestPasswordResetForm(request.POST or None)
+    message = ''
     if form.is_valid():
-        email = form.clean_date['email']
+        email = form.cleaned_data['email']
         user = get_object_or_404(User, email=email)
         #新しいトークンを作成
         password_reset_token, created = PsaawordResetToken.objects.get_or_create(user=user)
@@ -71,10 +72,36 @@ def request_password_reset(request):
             password_reset_token.save()
         user.is_active = False
         user.save()
-        print(password_reset_token.token)
+        token = password_reset_token.token
+        print(f"{request.scheme}://{request.get_host()}/user/reset_password/{token}")
+        message = 'パスワードリセットトークンをお送りしました'
     return render(request, 'user/password_reset_form.html', context={
-        'reset_form' : form, 
+        'reset_form' : form, 'message': message,
     })
-            
+    
+def reset_password(request, token):
+    password_reset_token = get_object_or_404(
+        PsaawordResetToken,
+        token=token,
+        used=False,
+    )
+    form = SetNewPasswordForm(request.POST or None)
+    message = ''
+    if form.is_valid():
+        user = password_reset_token.user
+        password = form.cleaned_data['password1']
+        validate_password(password)
+        #パスワード更新
+        user.set_password(password)
+        user.is_active = True
+        user.save()
         
+        password_reset_token.used = True #１回だけ使用可能
+        password_reset_token.save()
+        message = 'パスワードをリセットしました'
+        
+        
+    return render(request,'user/password_reset_confirm.html', context={
+        'form': form, 'message': message,
+    })
         

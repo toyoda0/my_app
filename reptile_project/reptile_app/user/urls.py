@@ -10,4 +10,5 @@ urlpatterns = [
     path('index/', views.index, name='index'),
     path('info/', views.info, name='info'),
     path('request_password_reset/', views.request_password_reset, name='request_password_reset'),
+    path('reset_password/<uuid:token>/', views.reset_password, name='reset_password'),
 ]
