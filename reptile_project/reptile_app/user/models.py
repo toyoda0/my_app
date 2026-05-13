@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import(
     BaseUserManager, AbstractBaseUser, PermissionsMixin
 )
+from django.conf import settings
 import uuid
 
 class UserManager(BaseUserManager):
@@ -44,7 +45,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 #パスワード再発行
 class PasswordResetToken(models.Model):
     user = models.OneToOneField(
-        User,
+        settings.AUTH_USER_MODEL,  #Userから変更　参照先を設定依存
         on_delete=models.CASCADE,
         related_name='password_reset_token',
     )
