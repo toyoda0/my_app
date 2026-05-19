@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'portfolio',
     'user',
+    'reptile',
 ]
 
 AUTH_USER_MODEL = 'user.User'
