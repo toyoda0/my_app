@@ -13,19 +13,31 @@ class Reptile(models.Model):
         on_delete=models.CASCADE,
         related_name='reptiles'
     )
-    name = models.CharField(max_length=100)
-    species = models.CharField(max_length=100)
-    molph = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, verbose_name='名前')
+    species = models.CharField(max_length=100, verbose_name='種類')
+    morph = models.CharField(max_length=100, blank=True, verbose_name='モルフ')
     sex = models.IntegerField(
         choices = SexChoices.choices,
-        default=SexChoices.UNKNOWN
+        default=SexChoices.UNKNOWN,
+        verbose_name='性別'
     )
-    birthday = models.DateField(null=True, blank=True)
-    adoption_date = models.DateField(null=True, blank=True) #お迎え日
-    record_end_date = models.DateField(null=True, blank=True) #お別れ日
+    birthday = models.DateField(null=True, blank=True, verbose_name='誕生日')
+    adoption_date = models.DateField(null=True, blank=True, verbose_name='お迎え日')
+    record_end_date = models.DateField(null=True, blank=True, verbose_name='お別れ日')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True) #更新日時
     
+    def __str__(self):
+        return self.name
+
+
+class CareType(models.Model):
+    name = models.CharField(max_length=50, verbose_name='お世話の名前')
+    
+    class Meta:
+        verbose_name = 'お世話の種類'
+        verbose_name_plural = 'お世話の種類'
+        
     def __str__(self):
         return self.name
     
@@ -37,17 +49,26 @@ class Record(models.Model):
     
     reptile = models.ForeignKey(Reptile, on_delete=models.CASCADE, related_name='records')
     record_date = models.DateField(verbose_name='記録日')
-    condition = models.IntegerField(choices=CONDITION_CHOICES, default=1)
-    weight = models.FloatField(null=True, blank=True)
-    length = models.FloatField(null=True, blank=True)
-    feeding = models.IntegerField
-    food_type_memo = models.CharField(max_length=100, blank=True)
-    feces = models.IntegerField(choices=FECES_CHOICES, default=1)
-    shedding = models.IntegerField(choices=BINARY_CHOICES, default=0)
-    image = models.ImageField(upload_to='records/', null=True, blank=True, verbose_name='写真')
-    memo = models.CharField(max_length=500, blank=True)
+    condition = models.IntegerField(choices=CONDITION_CHOICES, default=1, verbose_name='元気')
+    weight = models.FloatField(null=True, blank=True, verbose_name='体重(g)')
+    length = models.FloatField(null=True, blank=True, verbose_name='体長(cm)')
+    feeding = models.IntegerField(choices=BINARY_CHOICES, default=0, verbose_name='給餌')
+    food_type_memo = models.CharField(max_length=100, blank=True, verbose_name='餌の種類')
+    feces = models.IntegerField(choices=FECES_CHOICES, default=1, verbose_name='フン')
+    shedding = models.IntegerField(choices=BINARY_CHOICES, default=0, verbose_name='脱皮')
+    
+    care_type = models.ManyToManyField(
+        CareType,
+        blank=True,
+        related_name='records',
+        verbose_name='本日のお世話内容'
+    )
+    image = models.ImageField(upload_to='records/%y/%m/%d/', null=True, blank=True, verbose_name='写真')
+    memo = models.CharField(max_length=500, blank=True, verbose_name='メモ')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True) 
     
     def __str__(self):
         return f"{self.record_date} - {self.reptile.name}"
+
+
