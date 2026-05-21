@@ -43,7 +43,11 @@ class CareType(models.Model):
     
 
 class Record(models.Model):
-    CONDITION_CHOICES = [(0, '良い'), (1, '普通'), (2, '悪い')]
+    CONDITION_CHOICES = [
+        ('good', '元気'),
+        ('normal', '普通'),
+        ('bad', '元気がない'),
+    ]
     FECES_CHOICES = [(0, '異常'), (1, '正常')]
     BINARY_CHOICES = [(0, 'No'), (1, 'Yes')]
     

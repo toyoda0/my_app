@@ -22,4 +22,4 @@ class RecordAdmin(admin.ModelAdmin):
     list_display = ('record_date', 'reptile', 'condition', 'created_at')
     list_filter = ('condition', 'reptile', 'record_date')
     #ManyToManyField(お世話内容)を横並びの選択UIにする
-    filter_horizontal = ('care_type',)
+    #filter_horizontal = ('care_type',)
