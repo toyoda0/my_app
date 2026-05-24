@@ -19,7 +19,7 @@ class RecordForm(forms.ModelForm):
         }
         
     #care_tupe(お世話の種類)に入れた項目を持ってきてチェックボックス形式で選択肢にする
-    care_type = forms.ModelMultipleChoiceField(
+    care_types = forms.ModelMultipleChoiceField(
         queryset = CareType.objects.all(),
         widget = forms.CheckboxSelectMultiple,
         label = '今日やったお世話'

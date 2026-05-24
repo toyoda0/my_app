@@ -61,7 +61,7 @@ class Record(models.Model):
     feces = models.IntegerField(choices=FECES_CHOICES, default=1, verbose_name='フン')
     shedding = models.IntegerField(choices=BINARY_CHOICES, default=0, verbose_name='脱皮')
     
-    care_type = models.ManyToManyField(
+    care_types = models.ManyToManyField(
         CareType,
         blank=True,
         related_name='records',
