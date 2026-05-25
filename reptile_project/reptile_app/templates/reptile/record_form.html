@@ -4,28 +4,28 @@
 <head>
     <meta charset='UTF-8'>
     <title>お世話記録登録</title>
-    #あとでBoostrapの有無比較すること
+    
     <link 
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" 
     rel="stylesheet">
 
     <style>
-        #ラジオボタンを非表示にする
-        .condition-chioce input[type='radio']{
+        /* ラジオボタンを非表示にする */
+        .condition-choice input[type='radio']{
             display: none;
         }
         .condition-img {
-            cursor: pointer; #画像をクリックできるように変更
-            border: 3px solid transparent; #後で枠線を出すために透明な枠を作成
-            border-radius: 10px; #画像の角を丸く
-            padding: 5px; #内側に余白
-            transition: all 0.2s; #0.2秒で変化する
+            cursor: pointer; /* 画像をクリックできるように変更 */
+            border: 3px solid transparent; /* 後で枠線を出すために透明な枠を作成 */
+            border-radius: 10px; /* 画像の角を丸く */
+            padding: 5px; /* 内側に余白 */
+            transition: all 0.2s; /* 0.2秒で変化する */
         }
-        #マウスを乗せたとき画像のサイズを1.1倍にする
+        /* マウスを乗せたとき画像のサイズを1.1倍にする */
         .condition-img:hover {
-            transform: scal(1.1);
+            transform: scale(1.1);
         }
-        #condition-choiceクラスの中からラジオボタンにチェックした後ろの画像に緑の枠線をつける
+        /* condition-choiceクラスの中からラジオボタンにチェックした後ろの画像に緑の枠線をつける */
         .condition-choice input[type='radio']:checked + .condition-img{
             border-color: #198754;
         }
@@ -54,32 +54,32 @@
 
             <div class='mb-4'>
                 <label class='form-label fw-bold d-block'>元気</label>
-                <div class='d-flex justify-content-around aling-items-center bg-light p-3 rounded'
+                <div class='d-flex justify-content-around align-items-center bg-light p-3 rounded'>
             
                     <label class='condition-choice text-center'>
                         <input type='radio' name='condition' value='good'required>
-                        <img src='{% static 'reptile/inages/good.jpg' %}' alt='元気' class='condition-img' width='80' heigth='80'>
+                        <img src='{% static 'reptile/images/good.jpg' %}' alt='元気' class='condition-img' width='80' height='80'>
                         <small class='d-block mt-1'>元気</small>
                     </label>
 
                     <label class='condition-choice text-center'>
                         <input type='radio' name='condition' value='normal'>
-                        <img src='{% static 'reptile/inages/normal.jpg' %}' alt='普通' class='condition-img' width='80' heigth='80'>
+                        <img src='{% static 'reptile/images/normal.jpg' %}' alt='普通' class='condition-img' width='80' height='80'>
                         <small class='d-block mt-1'>普通</small>
                     </label>
 
                     <label class='condition-choice text-center'>
                         <input type='radio' name='condition' value='bad'>
-                        <img src='{% static 'reptile/inages/bad.jpg' %}' alt='元気がない' class='condition-img' width='80' heigth='80'>
+                        <img src='{% static 'reptile/images/bad.jpg' %}' alt='元気がない' class='condition-img' width='80' height='80'>
                         <small class='d-block mt-1'>元気がない</small>
                     </label>
 
                 </div>
             </div>
 
-            <div class='mb-4'> #Margin Bottom 4（下に少し広めの外側余白をあける）
+            <div class='mb-4'> 
                 <label class='form-label fw-bold'>{{ form.care_types.label }}</label>
-                <div class='ps-2'> #Padding Start 2（左側に少しだけ内側余白をあける）
+                <div class='ps-2'> 
                     {{ form.care_types }}
                 </div>
             </div>

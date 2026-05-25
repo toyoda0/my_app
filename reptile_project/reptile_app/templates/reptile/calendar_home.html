@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang = 'ja'>
+<head>
+    <meta charset = 'UTF-8'>
+    <title>Reptinote - カレンダー</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        /* カレンダーのマス目を縦横に広げて整える */
+        .calendar-table th, .calendar-table td {
+            text-align: center;
+            vertical-align: middle;
+            width: 14.28%; /* 7つの曜日で均等に7等分 */
+            heigth: 100px; /* マス目の高さ */
+            position: relative;
+        }
+        /* 日付の数字だけでなく、マス目のどこをクリックしても反応するようにする */
+        .date-link {
+            display: flex;
+            flex-direction: column; /* 中身(日付とアイコン)を縦1列に */
+            justify-content: space-between; /* 上下の端と端に広げて配置する */
+            align-items: center; /* 左右の真ん中に集める */
+            width: 100%;
+            height: 100%; /* 反応エリアをマス目全体に */
+            text-decoration: none; /* リンクの下線を消す */
+            color: #333;
+            font-weight: bold;
+            padding: 8px 0;
+            transition: background-color 0.2s;
+        }
+        /* マウスを乗せた(hover)ときに、どこを触っているか分かりやすく薄いグレーにする */
+        .date-link:hover{
+            background-color: #f1f3f5;
+            border-radius: 4px;
+        }
+        /* 「今日」の日付のマス目だけ、一目でわかるように薄い緑色にする */
+        .today-box{
+            background-color: #e8f5e9 !important; /* 最優先で今日に色をつける */
+        }
+        /* 上のナビバーの文字色を整える */
+        .nav-link-custom{
+            color: #2c3e50;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .nav-link-custom:hover{
+            color: #1b5e20;
+        }
+    </style>
+</head>
+<body class='bg-light'>
