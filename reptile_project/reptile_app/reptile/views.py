@@ -3,25 +3,50 @@ from django.views.generic import CreateView
 from django.urls import reverse_lazy
 from .models import Record
 from .forms import RecordForm
-import datetime
+import datetime, calendar
 
-def calendar_home(request):
+def calendar_home(request, year=None, month=None):
     #ログイン後に最初に表示されるカレンダー画面
-    import calendar
     today = datetime.date.today()
-    year = today.year
-    month = today.month
+    
+    #URLに年と月が送られてきていたらそれを使い、なければ今月にする
+    if year and month:
+        current_year = int(year)
+        current_month = int(month)
+    else:
+        current_year = today.year
+        current_month = today.month
     
     #日曜始まりのカレンダーにする
     cal = calendar.Calendar(firstweekday=6)
-    month_days = cal.monthdayscalendar(year, month)
+    month_days = cal.monthdayscalendar(current_year, current_month)
+    
+    #◀を押したときの先月を計算
+    if current_month == 1:
+        prev_year = current_year -1
+        prev_month = 12
+    else:
+        prev_year = current_year
+        prev_month = current_month -1
+    
+    #▶を押したときの次月を計算
+    if current_month == 12:
+        next_year = current_year +1
+        next_month = 1
+    else:
+        next_year = current_year
+        next_month = current_month +1
     
     #HTMLにもっていくデータ
     context = {
-        'year' : year,
-        'month' : month,
+        'year' : current_year,
+        'month' : current_month,
         'month_days' : month_days,
         'today' : today,
+        'prev_year' : prev_year,
+        'prev_month' : prev_month,
+        'next_year' : next_year,
+        'next_month' : next_month,
     }
     return render(request, 'reptile/calendar_home.html', context)
 
@@ -48,5 +73,6 @@ def record_add(request, year, month, day):
         else:
             #最初に画面を表示しただけの時の処理
             form = RecordForm(initial={'record_date': selected_date})
+            
         return render(request, 'reptile/record_form.html', {'form': form, 'selected_date': selected_date})
        
