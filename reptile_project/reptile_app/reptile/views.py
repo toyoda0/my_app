@@ -90,9 +90,9 @@ def record_add(request, year, month, day):
             form.save_m2m()
             
             return redirect('calendar_home') #保存したらカレンダー画面に戻る
-        else:
-            #最初に画面を表示しただけの時の処理
-            form = RecordForm(initial={'record_date': selected_date})
+    else:
+        #最初に画面を表示しただけの時の処理
+        form = RecordForm(initial={'record_date': selected_date})
             
-        return render(request, 'reptile/record_form.html', {'form': form, 'selected_date': selected_date})
+    return render(request, 'reptile/record_form.html', {'form': form, 'selected_date': selected_date})
        
