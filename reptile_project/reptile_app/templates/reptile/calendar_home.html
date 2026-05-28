@@ -113,15 +113,29 @@
                         {% for day in week %}
 
                             {% comment %}もし今作っているマスが、『今日の日付』と完全に一致したら、このマスにだけ today-box というクラスをつける {% endcomment %}
-                            <td class="p-0 {% if day == today.day and month == today.month and year == today.year %}today-box{% endif %}">
+                            <td class="p-0 {% if year == today.year and month == today.month and day.day_num == today.day %}today-box{% endif %}" style="height: 100px;">
 
                                 {% comment %} 今月の日付の時（0じゃない）に中身を書く {% endcomment %}
-                                {% if day != 0 %}
+                                {% if day.day_num > 0 %}
 
-                                    <a href="{% url 'record_add_with_date' year month day %}" class="date-link">
-                                        <span>{{ day }}</span>
+                                    <a href="{% url 'record_add_with_date' year month day.day_num %}" class="date-link"
+                                    style="display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 100% ">
 
-                                        <span style="font-size: 1.5rem; visibility: hidden;">☺</span>
+                                        <span style="align-self: flex-start;">{{ day.day_num }}</span>
+
+                                        <div class="condition-image-area" 
+                                        style="height: 35px; display: flex; align-items: center; justify-content: center;">
+                                            {% if day.record %}
+                                                {% if day.record.condition == 0 %}
+                                                    <img src="{% static 'reptile/images/good.jpg' %}" alt='元気' style="width: 30px; height: 30px; object-fit: contain;">
+                                                {% elif day.record.condition == 1 %}
+                                                    <img src="{% static 'reptile/images/normal.jpg' %}" alt='普通' style="width: 30px; height: 30px; object-fit: contain;">
+                                                {% elif day.record.condition == 2 %}
+                                                    <img src="{% static 'reptile/images/bad.jpg' %}" alt='悪い' style="width: 30px; height: 30px; object-fit: contain;">
+                                                {% endif %}
+                                            {% endif %}
+                                        </div>
+
                                     </a>
 
                                 {% endif %}

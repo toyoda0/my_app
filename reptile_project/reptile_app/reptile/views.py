@@ -21,6 +21,26 @@ def calendar_home(request, year=None, month=None):
     cal = calendar.Calendar(firstweekday=6)
     month_days = cal.monthdayscalendar(current_year, current_month)
     
+    #データベースから今月分のデータを取得してカレンダーの数字と合わせる処理
+    #Recordから、表示したい年月に一致する記録をもってくる
+    records = Record.objects.filter(record_date__year=current_year, record_date__month=current_month,)
+    #日付からレコードを探せるように辞書にする
+    record_dict = {record.record_date.day: record for record in records}
+    #お世話情報付きの1か月分のカレンダーデータの箱
+    custom_month_days = []
+    for week in month_days:
+        week_date = []
+        for day in week:
+            #その日のレコードがあれば取得、ない日か0の日はNone
+            day_record = record_dict.get(day) if day != 0 else None
+            #日付の数字とレコードをひとまとめにした辞書
+            day_info = {'day_num': day, 'record': day_record}
+            #1日分のデータを週の箱に入れて並べる
+            week_date.append(day_info)
+        #7日分で週の箱ができたら月の箱に入れる
+        custom_month_days.append(week_date)
+    
+    
     #◀を押したときの先月を計算
     if current_month == 1:
         prev_year = current_year -1
@@ -41,7 +61,7 @@ def calendar_home(request, year=None, month=None):
     context = {
         'year' : current_year,
         'month' : current_month,
-        'month_days' : month_days,
+        'month_days' : custom_month_days,
         'today' : today,
         'prev_year' : prev_year,
         'prev_month' : prev_month,
