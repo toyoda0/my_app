@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Reptinote - ペット一覧</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .nav-link-custom {
+            color: #2c3e50;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .nav-link-custom:hover {
+            color: #1b5e20;
+        }
+        .pet-card {
+            background-color: #e8f5e9;
+            border: 1px solid #a5d6a7;
+            border-radius: 15px;
+            padding: 20px 30px;
+            margin-bottom: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            color: #333;
+            display: block;
+        }
+        .pet-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0,08);
+            color: #333;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+#ヘッダー
+<nav class="navbar navbar-expand shadow-sm" style="background-color: #a5d6a7;">
+    <div class="container"> 
+        <a class="navbar-brand fw-bold text-success fs-3" href="{% url 'calendar_home' %}">Reptinote</a>
+
+        <div class="d-flex ms-auto">
+            <a href="{% url 'reptile_list' %}" class="nav-link-custom px-3 text-decoration-underline text-success">ペット</a>
+            <a href="{% url 'calendar_home' %}" class="nav-link-custom px-3">カレンダー</a>
+            <a href="#" class="nav-link-custom px-3">設定</a>
+            <a href="#" class="nav-link-custom px-3 text-danger">ログアウト</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-5" style="max-width: 700px;">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-secondary m-0" style="font-size: 1.5rem;">ペット一覧</h2>
+        <a href="{% url 'reptile_add' %}" class="fw-bold text-success fs-5">ペット追加</a>
+    </div>
+
+    {% comment %} ペットを並べる外枠 {% endcomment %}
+    <div class="pet-list-container">
+        {% for reptile in reptiles %}
+            {% comment %} そのペットの詳細画面へのリンク張ること {% endcomment %}
+            <a href="#" class="pet-card shadow-sm">
+                <div class="d-flex align-items-center">
+                    <span class="fw-bold fs-3 me-4">{{ reptile.name }}</span>
+                    <span class="text-muted fs-5">{{ reptile.species }}</span>
+                </div>
+            </a>
+        {% empty %}
+            <div class="text-center py-5 bg-white rounded shadow-sm">
+                <p class="text-muted mb-3">登録されているペットがいません</p>
+            </div>
+        {% endfor %}    
+    </div>
+
+</div>
+
+</body>
+</html>

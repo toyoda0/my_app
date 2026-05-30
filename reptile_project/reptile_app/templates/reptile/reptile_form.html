@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Reptinote - 新しいペットの登録</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container mt-5" style="max-width: 600px;">
+    <div class="card shadow-sm p-4 bg-white rounded-3 border-0">
+        <h3 class="fw-bold text-success mb-4 text-center">ペットの登録</h3>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            {% comment %} views.pyのfieldsをfieldという名前の変数に入れる {% endcomment %}
+            {% for field in form %}
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-dark">{{ field.label }}</label>
+                    <div class="form-control-container">
+                        {% comment %} 今処理している項目の入力タイプがselectなら {% endcomment %}
+                        {% if field.field.widget.input_type == 'select' %}
+                            {% comment %} field.nameに今処理している項目のプログラム上の英語名が入る {% endcomment %}
+                            <select name="{{ field.name }}" class="form-select border-success">
+                                {% comment %} この項目が持っている選択肢のリストから、1ペアずつ取り出してchoiceという名前の箱に入れて繰り返して {% endcomment %}
+                                {% for choice in field.field.choices %}
+                                    <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        {% else %}
+                            {% comment %} それ以外なら入力箱 {% endcomment %}
+                            <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" class="form-control border-success" value="{{ field.value|default:""}}">
+                        {% endif %}
+                    </div>
+                    {% if field.errors %}
+                        {% comment %} エラーがあったら赤で小さく警告文字 {% endcomment %}
+                        <div class="text-danger small">{{ field.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{% url 'calendar_home' %}" class="btn btn-secondary px-4 ">戻る</a>
+                <button type="submit" class="btn btn-success px-4 fw-bold">ペットを登録する</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

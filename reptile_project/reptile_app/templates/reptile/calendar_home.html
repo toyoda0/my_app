@@ -60,10 +60,10 @@
 
         {% comment %} 横1列で並べて、左側のマージンを最大に {% endcomment %}
         <div class="d-flex ms-auto">
-            {% comment %} 行き先仮に#にしたから後で追記すること {% endcomment %}
-            <a href="#" class="nav-link-custom px-3">ペット</a>
+            <a href="{% url 'reptile_list' %}" class="nav-link-custom px-3">ペット</a>
             {% comment %} successでメニューの文字を強調して選んでるのが分かるように {% endcomment %}
             <a href="{% url "calendar_home" %}" class="nav-link-custom px-3 text-decoration-underline text-success">カレンダー</a>
+            {% comment %} 行き先仮に#にしたから後で追記すること {% endcomment %}
             <a href="#" class="nav-link-custom px-3">設定</a>
             {% comment %} text-dangerで赤文字にして注意するように {% endcomment %}
             <a href="#" class="nav-link-custom px-3 text-danger">ログアウト</a>

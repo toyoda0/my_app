@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect
 from django.views.generic import CreateView
 from django.urls import reverse_lazy
-from .models import Record
+from .models import Record, Reptile
 from .forms import RecordForm
+from django import forms
 import datetime, calendar
+
 
 def calendar_home(request, year=None, month=None):
     #ログイン後に最初に表示されるカレンダー画面
@@ -95,4 +97,39 @@ def record_add(request, year, month, day):
         form = RecordForm(initial={'record_date': selected_date})
             
     return render(request, 'reptile/record_form.html', {'form': form, 'selected_date': selected_date})
-       
+
+
+class ReptileForm(forms.ModelForm):
+    class Meta:
+        model = Reptile
+        #画面で入力する項目
+        fields = ['name', 'species', 'morph', 'sex', 'birthday', 'adoption_date', 'record_end_date']
+        #カレンダー入力しやすいように日付の見た目を調整
+        widgets = {
+            'birthday': forms.DateInput(attrs={'type': 'date'}),
+            'adoption_date': forms.DateInput(attrs={'type': 'date'}),
+            'record_end_date': forms.DateInput(attrs={'type': 'date'}),
+        } 
+
+#ログインユーザーを飼い主にして個体追加        
+def reptile_add(request):
+    if request.method == 'POST':
+        form = ReptileForm(request.POST)
+        if form.is_valid():
+            reptile = form.save(commit=False)
+            #ログインしているユーザーを飼い主にセット
+            reptile.owner = request.user
+            reptile.save()
+            return redirect('calendar_home')
+    else:
+        form = ReptileForm()
+        
+    return render(request, 'reptile/reptile_form.html', {'form': form})
+
+
+def reptile_list(request):
+    #ログインしているユーザーが飼っているペットだけを一覧で取得
+        reptiles = Reptile.objects.filter(owner=request.user)
+        
+        return render(request, 'reptile/reptile_list.html', {'reptiles': reptiles})
+    
