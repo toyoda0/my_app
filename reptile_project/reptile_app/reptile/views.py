@@ -23,9 +23,28 @@ def calendar_home(request, year=None, month=None):
     cal = calendar.Calendar(firstweekday=6)
     month_days = cal.monthdayscalendar(current_year, current_month)
     
-    #データベースから今月分のデータを取得してカレンダーの数字と合わせる処理
-    #Recordから、表示したい年月に一致する記録をもってくる
-    records = Record.objects.filter(record_date__year=current_year, record_date__month=current_month,)
+    #ログイン中のユーザーのペット一覧を取得
+    user_reptiles = Reptile.objects.filter(owner=request.user)
+    
+    #画面(URLパラメータ)から選ばれたペットIDを取得
+    #なければ1匹目のペットのIDをデフォルトに
+    selected_pet_id = request.GET.get('pet_id')
+    if not selected_pet_id and user_reptiles.exists():
+        selected_pet_id = user_reptiles.first().id
+        
+    if selected_pet_id:
+        #データベースから今月分のデータを取得してカレンダーの数字と合わせる処理
+        #Recordから、表示したい年月、選んだペットに一致する記録をもってくる
+        records = Record.objects.filter(
+            record_date__year=current_year,
+            record_date__month=current_month,
+            reptile_id=selected_pet_id
+        )
+    else:
+        #ペットが登録されていない場合は空にする
+        records = Record.objects.none()
+        
+    
     #日付からレコードを探せるように辞書にする
     record_dict = {record.record_date.day: record for record in records}
     #お世話情報付きの1か月分のカレンダーデータの箱
@@ -69,6 +88,8 @@ def calendar_home(request, year=None, month=None):
         'prev_month' : prev_month,
         'next_year' : next_year,
         'next_month' : next_month,
+        'user_reptiles': user_reptiles,
+        'selected_pet_id': int(selected_pet_id) if selected_pet_id else None,
     }
     return render(request, 'reptile/calendar_home.html', context)
 
@@ -103,12 +124,11 @@ class ReptileForm(forms.ModelForm):
     class Meta:
         model = Reptile
         #画面で入力する項目
-        fields = ['name', 'species', 'morph', 'sex', 'birthday', 'adoption_date', 'record_end_date']
+        fields = ['name', 'species', 'morph', 'sex', 'birthday', 'adoption_date']
         #カレンダー入力しやすいように日付の見た目を調整
         widgets = {
             'birthday': forms.DateInput(attrs={'type': 'date'}),
             'adoption_date': forms.DateInput(attrs={'type': 'date'}),
-            'record_end_date': forms.DateInput(attrs={'type': 'date'}),
         } 
 
 #ログインユーザーを飼い主にして個体追加        
