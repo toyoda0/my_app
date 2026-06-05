@@ -4,12 +4,25 @@
     <meta charset="UTF-8">
     <title>Reptinote - 新しいペットの登録</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bs-primary: #2e7d32;
+            --bs-primary-text-emphasis: #2e7d32;
+            --bs-primary-rgb: 46, 125, 50;
+            .btn-primary {
+            background-color: #2e7d32 !important; /* ボタンの背景を緑に */
+            border-color: #2e7d32 !important;     /* ボタンの枠線を緑に */
+            color: #ffffff !important;            /* 文字は白に */
+        }
+    </style>
 </head>
+
+
 <body class="bg-light">
 
 <div class="container mt-5" style="max-width: 600px;">
     <div class="card shadow-sm p-4 bg-white rounded-3 border-0">
-        <h3 class="fw-bold text-success mb-4 text-center">ペットの登録</h3>
+        <h3 class="fw-bold text-primary mb-4 text-center">ペットの登録</h3>
 
         <form method="POST">
             {% csrf_token %}
@@ -22,7 +35,7 @@
                         {% comment %} 今処理している項目の入力タイプがselectなら {% endcomment %}
                         {% if field.field.widget.input_type == 'select' %}
                             {% comment %} field.nameに今処理している項目のプログラム上の英語名が入る {% endcomment %}
-                            <select name="{{ field.name }}" class="form-select border-success">
+                            <select name="{{ field.name }}" class="form-select border-primary">
                                 {% comment %} この項目が持っている選択肢のリストから、1ペアずつ取り出してchoiceという名前の箱に入れて繰り返して {% endcomment %}
                                 {% for choice in field.field.choices %}
                                     <option value="{{ choice.0 }}">{{ choice.1 }}</option>
@@ -30,7 +43,7 @@
                             </select>
                         {% else %}
                             {% comment %} それ以外なら入力箱 {% endcomment %}
-                            <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" class="form-control border-success" value="{{ field.value|default:""}}">
+                            <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" class="form-control border-primary" value="{{ field.value|default:""}}">
                         {% endif %}
                     </div>
                     {% if field.errors %}
@@ -41,7 +54,7 @@
             {% endfor %}
 
             <div class="d-flex justify-content-between mt-4">
-                <button type="submit" class="btn btn-success px-4 fw-bold">ペットを登録する</button>
+                <button type="submit" class="btn btn-primary px-4 fw-bold">ペットを登録する</button>
                 <a href="{% url 'calendar_home' %}" class="btn btn-secondary px-4 ">戻る</a>
             </div>
         </form>

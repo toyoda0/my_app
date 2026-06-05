@@ -10,6 +10,11 @@
     rel="stylesheet">
 
     <style>
+        :root {
+            --bs-primary: #2e7d32;
+            --bs-primary-text-emphasis: #2e7d32;
+            --bs-primary-rgb: 46, 125, 50;
+        }
         /* ラジオボタンを非表示にする */
         .condition-choice input[type='radio']{
             display: none;
@@ -36,7 +41,7 @@
 
 <div class="container" style="max-width: 600px;">
      <div class="card shadow-sm p-4 bg-white rounded">
-         <h2 class="mb-4 text-center text-success">お世話の記録</h2>
+         <h2 class="mb-4 text-center text-primary">お世話の記録</h2>
          
          <form method="POST">
         
@@ -89,7 +94,7 @@
                 {{ form.memo }}
             </div>
 
-            <button type='submit' class='btn btn-success w-100 py-2 fw-bold fs-5'>記録を保存する</button>
+            <button type='submit' class='btn btn-primary w-100 py-2 fw-bold fs-5'>記録を保存する</button>
         </form>
     </div>
 </div>
