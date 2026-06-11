@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import CreateView
 from django.urls import reverse_lazy
 from .models import Record, Reptile
@@ -124,11 +124,16 @@ class ReptileForm(forms.ModelForm):
     class Meta:
         model = Reptile
         #画面で入力する項目
-        fields = ['name', 'species', 'morph', 'sex', 'birthday', 'adoption_date']
+        fields = ['name', 'species', 'morph', 'sex', 'birthday', 'adoption_date', 'memo']
         #カレンダー入力しやすいように日付の見た目を調整
         widgets = {
             'birthday': forms.DateInput(attrs={'type': 'date'}),
             'adoption_date': forms.DateInput(attrs={'type': 'date'}),
+            'memo': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'メモ(最大500文字)'
+            }),
         } 
 
 #ログインユーザーを飼い主にして個体追加        
@@ -153,3 +158,15 @@ def reptile_list(request):
         
         return render(request, 'reptile/reptile_list.html', {'reptiles': reptiles})
     
+    
+def reptile_detail(request, pk):
+    # データベースから指定されたID（pk）のペットを1匹だけ取得。なければ404エラー（画面がありません）を返す
+    reptile = get_object_or_404(Reptile, pk=pk, owner=request.user)
+    # 性別の数字（0, 1, 2）を、モデルで定義した文字（不明, 男の子, 女の子）に変換する
+    sex_display = reptile.get_sex_display()
+    
+    context = {
+        'reptile': reptile,
+        'sex_display': sex_display,
+    }
+    return render(request, 'reptile/reptile_detail.html', context)

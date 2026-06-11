@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang='ja'>
+<head>
+    <meta charset='UTF-8'>
+    <title>{% block title %}ReptiNote{% endblock %}</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --bs-primary: #2e7d32; 
+            --bs-primary-text-emphasis: #2e7d32;
+            --bs-primary-rgb: 46, 125, 50;
+        }
+
+        .nav-link-custom {
+            color: #2c3e50;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .nav-link-custom:hover {
+            color: #1b5e20;
+        }
+        {% block extra_css %}{% endblock %}
+    </style>
+</head>
+
+<body class="bg-light">
+{# ヘッダーメニュー 横長のメニューバーを作る #}
+<nav class="navbar navbar-expand shadow-sm" style="background-color: #a5d6a7;">
+    {# 横幅を整えるための内側の箱 #}
+    <div class="container"> 
+        <a class="navbar-brand fw-bold text-primary fs-3" href="{% url 'calendar_home' %}">Reptinote</a>
+
+        {# 横1列で並べて、左側のマージンを最大に #}
+        <div class="d-flex ms-auto">
+            <a href="{% url 'reptile_list' %}" class="nav-link-custom px-3">ペット</a>
+            {# メニューの文字を強調して選んでるのが分かるように #}
+            <a href="{% url "calendar_home" %}" class="nav-link-custom px-3 text-decoration-underline text-primary">カレンダー</a>
+            {# 行き先仮に#にしたから後で追記すること #}
+            <a href="#" class="nav-link-custom px-3">設定</a>
+            {# text-dangerで赤文字にして注意するように #}
+            <a href="{% url 'user:logout' %}" class="nav-link-custom px-3 text-danger">ログアウト</a>
+        </div>
+    </div>
+</nav>
+
+{% block content %}
+{% endblock %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

@@ -1,6 +1,13 @@
 {% extends "user/base.html" %}
 {% block content %}
 <h1>登録画面</h1>
+
+{% if user_form.errors %}
+<div style="color: red; margin-bottom: 20px">
+    <strong>登録に失敗しました。以下の内容を確認してください: </strong>
+    {{ user_form.non_firld_errors }}
+</div>
+{% endif %}
 <form method="POST">
     {% csrf_token %}
     {{ user_form.as_p }}

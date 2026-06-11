@@ -24,8 +24,13 @@ class Reptile(models.Model):
     birthday = models.DateField(null=True, blank=True, verbose_name='誕生日')
     adoption_date = models.DateField(null=True, blank=True, verbose_name='お迎え日')
     record_end_date = models.DateField(null=True, blank=True, verbose_name='お別れ日')
+    memo = models.CharField(max_length=500, null=True, blank=True, verbose_name='メモ')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True) #更新日時
+    
+    class Meta:
+        db_table = 'reptiles'
+        verbose_name_plural = '爬虫類'
     
     def __str__(self):
         return self.name
@@ -35,6 +40,7 @@ class CareType(models.Model):
     name = models.CharField(max_length=50, verbose_name='お世話の名前')
     
     class Meta:
+        db_table = 'care_types'
         verbose_name = 'お世話の種類'
         verbose_name_plural = 'お世話の種類'
         
@@ -71,6 +77,10 @@ class Record(models.Model):
     memo = models.CharField(max_length=500, blank=True, verbose_name='メモ')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True) 
+    
+    class Meta:
+        db_table = 'recoeds'
+        verbose_name_plural = '飼育記録'
     
     def __str__(self):
         return f"{self.record_date} - {self.reptile.name}"

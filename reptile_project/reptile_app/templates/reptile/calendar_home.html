@@ -72,7 +72,7 @@
             {# 行き先仮に#にしたから後で追記すること #}
             <a href="#" class="nav-link-custom px-3">設定</a>
             {# text-dangerで赤文字にして注意するように #}
-            <a href="#" class="nav-link-custom px-3 text-danger">ログアウト</a>
+            <a href="{% url 'user:logout' %}" class="nav-link-custom px-3 text-danger">ログアウト</a>
         </div>
     </div>
 </nav>

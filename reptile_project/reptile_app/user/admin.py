@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from .forms import UserCreationForm, UserChangeForm
-from .models import Students, Schools
+from .models import PasswordResetToken
 
 
 User = get_user_model()
@@ -15,7 +15,7 @@ class CustomizeUserAdmin(UserAdmin):
     
     fieldsets = (
         ('ユーザー情報', {
-                'fields': ('username', 'email', 'password', 'website', 'picture')
+                'fields': ('username', 'email', 'password')
             }),
         ('パーミッション', {'fields': ('is_staff', 'is_active', 'is_superuser')})
     )
@@ -23,31 +23,14 @@ class CustomizeUserAdmin(UserAdmin):
     add_fieldsets = (
         (
             'ユーザー情報',{
-                'fields':('username', 'email', 'password1', 'password2')
+                'fields':('username', 'email', 'password', 'confirm_password')
             }
             
         ),
     )
 
 admin.site.register(User, CustomizeUserAdmin)
-#admin.site.register(Students) #後でReptileにする
-#admin.site.register(Schools) #後でReptileにする
 
-@admin.register(Students)
-class StudentsAdmin(admin.ModelAdmin):
-    fields = ('name', 'score', 'age', 'school')
-    list_display = ('id', 'name', 'age', 'score', 'school') #一覧画面上に表示する
-    list_display_links = ('id',) #クリックしたら編集画面に移る
-    search_fields = ('name', 'age')
-    list_filter = ('name', 'age', 'score', 'school')
-    list_editable = ('name', 'age', 'score', 'school')
-    
-@admin.register(Schools)
-class SchoolAdmin(admin.ModelAdmin):
-    list_display = ('name', 'student_count')
-    
-    def student_count(self, obj):
-        count = obj.students.count()
-        return count
-    
-    student_count.short_description = '生徒数'
+@admin.register(PasswordResetToken)
+class PasswordResetTokenAdmin(admin.ModelAdmin):
+    list_display = ('user', 'token', 'used')

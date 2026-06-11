@@ -38,7 +38,7 @@
 </head>
 <body class="bg-light">
 
-#ヘッダー
+{% comment %} ヘッダー {% endcomment %}
 <nav class="navbar navbar-expand shadow-sm" style="background-color: #a5d6a7;">
     <div class="container"> 
         <a class="navbar-brand fw-bold text-primary fs-3" href="{% url 'calendar_home' %}">Reptinote</a>
@@ -47,7 +47,7 @@
             <a href="{% url 'reptile_list' %}" class="nav-link-custom px-3 text-decoration-underline text-primary">ペット</a>
             <a href="{% url 'calendar_home' %}" class="nav-link-custom px-3">カレンダー</a>
             <a href="#" class="nav-link-custom px-3">設定</a>
-            <a href="#" class="nav-link-custom px-3 text-danger">ログアウト</a>
+            <a href="{% url 'user:logout' %}" class="nav-link-custom px-3 text-danger">ログアウト</a>
         </div>
     </div>
 </nav>
@@ -63,7 +63,7 @@
     <div class="pet-list-container">
         {% for reptile in reptiles %}
             {% comment %} そのペットの詳細画面へのリンク張ること {% endcomment %}
-            <a href="#" class="pet-card shadow-sm">
+            <a href="{% url 'reptile_detail' reptile.pk %}" class="pet-card shadow-sm">
                 <div class="d-flex align-items-center">
                     <span class="fw-bold fs-3 me-4">{{ reptile.name }}</span>
                     <span class="text-muted fs-5">{{ reptile.species }}</span>

@@ -15,7 +15,7 @@ class RecordForm(forms.ModelForm):
             #conditionをラジオボタンに変更
             'condition' : forms.RadioSelect(),
             #memoの欄を大きくする
-            'mamo' : forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'memo' : forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
         
     #care_tupe(お世話の種類)に入れた項目を持ってきてチェックボックス形式で選択肢にする

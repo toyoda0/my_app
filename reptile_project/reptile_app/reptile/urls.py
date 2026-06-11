@@ -2,8 +2,8 @@ from django.urls import path
 from .import views
 
 urlpatterns = [
-    #カレンダー画面のURLは後で作成すること
-    path('', views.calendar_home, name='calendar_home'),
+    #カレンダー画面
+    path('calendar_home/', views.calendar_home, name='calendar_home'),
     #特定の年月を指定されたらそのカレンダーを出す(矢印押したとき)
     path('calendar/<int:year>/<int:month>/', views.calendar_home, name='calendar_move'),
     #カレンダーから日付を引っ張ってくる用のURL
@@ -12,4 +12,6 @@ urlpatterns = [
     path('reptile/add/', views.reptile_add, name='reptile_add'),
     #ペット一覧
     path('reptiles/', views.reptile_list, name='reptile_list'),
+    #ペット詳細
+    path('reptile/<int:pk>', views.reptile_detail, name='reptile_detail'),
 ]

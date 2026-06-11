@@ -5,20 +5,23 @@ from django.contrib.auth.models import(
 from django.conf import settings
 import uuid
 
+#ユーザーを新規登録
 class UserManager(BaseUserManager):
     
-    def create_user(self, email, username, password=None, **extra_fields):
+    def create_user(self, email, username, password, **extra_fields):
         if not email:
             raise ValueError('メールアドレスは必須です')
         if not username:
             raise ValueError('ユーザー名は必須です')
+        if not password:
+            raise ValueError('パスワードは必須です')
         email = self.normalize_email(email)
         user = self.model(email=email, username=username, **extra_fields)
         user.set_password(password)
         user.save()
         return user
     
-    def create_superuser(self, email, username, password=None, **extra_fields):
+    def create_superuser(self, email, username, password, **extra_fields):
         extra_fields['is_staff'] = True
         extra_fields['is_active'] = True
         extra_fields['is_superuser'] = True
@@ -30,46 +33,20 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
-    website = models.URLField(null=True)
-    picture = models.FileField(null=True)
     
     objects = UserManager()
     
-    USERNAME_FIELD = 'email' #このテーブルのレコードを一意に識別するField
+    USERNAME_FIELD = 'email' #ログインする時のIDはemail
     REQUIRED_FIELDS = ['username'] #createsuperuserの時に入力を求められる
     
+    #管理画面でIDじゃなくてemailで一覧表示する
     def __str__(self):
         return self.email
     
-class Students(models.Model): #後でclass Reptileにする
-    name = models.CharField(max_length=20)
-    age = models.IntegerField()
-    score = models.IntegerField()
-    school = models.ForeignKey(
-        'Schools', on_delete=models.CASCADE, related_name='students',
-    )
-    
-    class Meta:
-        db_table = 'students'
-        verbose_name_plural = '生徒'
-        ordering = ('age', '-score',)
-        
-    def __str__(self):
-        return f'{self.name}: {self.age}'
-        
-class Schools(models.Model):
-    name = models.CharField(max_length=20, verbose_name='学校名')
-    
-    class Meta:
-        db_table = 'schools'
-        verbose_name_plural = '学校'
-
-    def __str__(self):
-        return self.name
-
 
 #パスワード再発行
 class PasswordResetToken(models.Model):
+    #ユーザー1人に対してトークンは1つだけ
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,  #Userから変更　参照先を設定依存
         on_delete=models.CASCADE,
@@ -77,3 +54,7 @@ class PasswordResetToken(models.Model):
     )
     token = models.UUIDField(default=uuid.uuid4, db_index=True)
     used = models.BooleanField(default=False)
+    
+    class Meta:
+        db_table = 'password_reset_tokens'
+        verbose_name_plural = 'パスワードリセットトークン'
