@@ -1,83 +1,47 @@
+{% extends "reptile/reptile_base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang = "ja">
-<head>
-    <meta charset = "UTF-8">
-    <title>Reptinote - カレンダー</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <style>
-        :root {
-            --bs-primary: #2e7d32;       /* primaryの元の色を上書き */
-            --bs-primary-text-emphasis: #2e7d32;
-            --bs-primary-rgb: 46, 125, 50; /* 曜日の背景などの淡い色（透明度用） */
-        }
+{% block title %}Reptinote - カレンダー{% endblock %}
 
-        /* カレンダーのマス目を縦横に広げて整える */
-        .calendar-table th, .calendar-table td {
-            text-align: center;
-            vertical-align: middle;
-            width: 14.28%; /* 7つの曜日で均等に7等分 */
-            height: 100px; /* マス目の高さ */
-            position: relative;
-        }
-        /* 日付の数字だけでなく、マス目のどこをクリックしても反応するようにする */
-        .date-link {
-            display: flex;
-            flex-direction: column; /* 中身(日付とアイコン)を縦1列に */
-            justify-content: space-between; /* 上下の端と端に広げて配置する */
-            align-items: center; /* 左右の真ん中に集める */
-            width: 100%;
-            height: 100%; /* 反応エリアをマス目全体に */
-            text-decoration: none; /* リンクの下線を消す */
-            color: #333;
-            font-weight: bold;
-            padding: 8px 0;
-            transition: background-color 0.2s;
-        }
-        /* マウスを乗せた(hover)ときに、どこを触っているか分かりやすく薄いグレーにする */
-        .date-link:hover{
-            background-color: #f1f3f5;
-            border-radius: 4px;
-        }
-        /* 「今日」の日付のマス目だけ、一目でわかるように薄い緑色にする */
-        .today-box{
-            background-color: #e8f5e9 !important; /* 最優先で今日に色をつける */
-        }
-        /* 上のナビバーの文字色を整える */
-        .nav-link-custom{
-            color: #2c3e50;
-            font-weight: bold;
-            text-decoration: none;
-        }
-        .nav-link-custom:hover{
-            color: #1b5e20;
-        }
-    </style>
-</head>
-<body class="bg-light">
+{% block active_calendar %}text-decoration-underline text-primary{% endblock %}
 
 
-{# ヘッダーメニュー 横長のメニューバーを作る #}
-<nav class="navbar navbar-expand shadow-sm" style="background-color: #a5d6a7;">
-    {# 横幅を整えるための内側の箱 #}
-    <div class="container"> 
-        <a class="navbar-brand fw-bold text-primary fs-3" href="{% url 'calendar_home' %}">Reptinote</a>
+{% block extra_css %}
+/* カレンダーのマス目を縦横に広げて整える */
+.calendar-table th, .calendar-table td {
+    text-align: center;
+    vertical-align: middle;
+    width: 14.28%; /* 7つの曜日で均等に7等分 */
+    height: 100px; /* マス目の高さ */
+    position: relative;
+}
+/* 日付の数字だけでなく、マス目のどこをクリックしても反応するようにする */
+.date-link {
+    display: flex;
+    flex-direction: column; /* 中身(日付とアイコン)を縦1列に */
+    justify-content: space-between; /* 上下の端と端に広げて配置する */
+    align-items: center; /* 左右の真ん中に集める */
+    width: 100%;
+    height: 100%; /* 反応エリアをマス目全体に */
+    text-decoration: none; /* リンクの下線を消す */
+    color: #333;
+    font-weight: bold;
+    padding: 8px 0;
+    transition: background-color 0.2s;
+}
+/* マウスを乗せた(hover)ときに、どこを触っているか分かりやすく薄いグレーにする */
+.date-link:hover{
+    background-color: #f1f3f5;
+    border-radius: 4px;
+}
+/* 「今日」の日付のマス目だけ、一目でわかるように薄い緑色にする */
+.today-box{
+    background-color: #e8f5e9 !important; /* 最優先で今日に色をつける */
+}
+{% endblock %}
 
-        {# 横1列で並べて、左側のマージンを最大に #}
-        <div class="d-flex ms-auto">
-            <a href="{% url 'reptile_list' %}" class="nav-link-custom px-3">ペット</a>
-            {# メニューの文字を強調して選んでるのが分かるように #}
-            <a href="{% url "calendar_home" %}" class="nav-link-custom px-3 text-decoration-underline text-primary">カレンダー</a>
-            {# 行き先仮に#にしたから後で追記すること #}
-            <a href="#" class="nav-link-custom px-3">設定</a>
-            {# text-dangerで赤文字にして注意するように #}
-            <a href="{% url 'user:logout' %}" class="nav-link-custom px-3 text-danger">ログアウト</a>
-        </div>
-    </div>
-</nav>
 
-
+{% block content %}
 {# カレンダー全体の土台 #}
 <div class="container mt-5" style="max-width: 900px;"> 
     <div class="card shadow-sm p-4 bg-white rounded-3 border-0"> 
@@ -86,11 +50,11 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             {# 年月を表示する見出しタグ #}
             <h3 class="fw-bold text-dark m-0">
-                <a href={% url 'calendar_move' prev_year prev_month %} class='text-decoration-none text-primary'>◀</a>
+                <a href="{% url 'calendar_move' prev_year prev_month %}" class='text-decoration-none text-primary'>◀</a>
 
                 {{ year }}年 {{ month }}月
 
-                <a href={% url 'calendar_move' next_year next_month %} class='text-decoration-none text-primary'>▶</a>
+                <a href="{% url 'calendar_move' next_year next_month %}" class='text-decoration-none text-primary'>▶</a>
             </h3>
 
             {# セレクトボックスが広がりすぎないよう固定 #}
@@ -142,7 +106,7 @@
                                     <div class="condition-image-area" 
                                      style="position: absolute; bottom: 8px; left: 0; right: 0; display: flex; justify-content: center; z-index: 10;">
                                         {% if day.record %}
-                                            {# 顔マークのボタンに仕込んだデータ　JavaScriptが参照する #}
+                                            {# 顔マークのボタンに仕込んだデータ JavaScriptが参照する #}
                                             <button type="button" class="btn p-0 border-0 bg-transparent"
                                                     style="display: block; width: 30px; height: 30px; cursor: pointer; outline: none;"
                                                     data-bs-toggle="modal"
@@ -155,8 +119,8 @@
                                                     data-weight="{{ day.record.weight|default:'---'}}g"
                                                     {# data-feeding: 給餌のあり・なし #}
                                                     data-feeding="{% if day.record.feeding %}あり{% else %}なし{% endif %}"
-                                                    {# data-poop: フンの状態（0なら正常） #}
-                                                    data-poop="{% if day.record.poop == 0 %}正常{% else %}異常・なし{% endif %}"
+                                                    {# data-feces: フンの状態（0なら正常） #}
+                                                    data-feces="{% if day.record.feces == 0 %}正常{% else %}異常・なし{% endif %}"
                                                     {# data-shedding: 脱皮の状態 #}
                                                     data-shedding="{% if day.record.get_shedding_display %}{{ day.record.get_shedding_display }}{% else %}なし{% endif %}"
                                                     {# data-care: お世話内容 #}
@@ -165,16 +129,8 @@
                                                     data-memo="{{ day.record.memo|default:'(メモなし)' }}"
                                                     {# data-photo: 当日の写真画像（登録されていればそのURL） #}
                                                     data-photo="{% if day.record.photo %}{{ day.record.photo.url }}{% else %}{% endif %}"
-                                                    data-condition-img="{% if day.record.condition == 0 %}{% static 'reptile/images/good.jpg' %}{% elif day.record.condition == 1 %}{% static 'reptile/images/normal.jpg' %}{% elif day.record.condition == 2 %}{% static 'reptile/images/bad.jpg' %}{% endif %}"
+                                                    data-condition-img="{% if day.record.condition == 0 %}{% static 'reptile/images/good.jpg' %}{% elif day.record.condition == 1 %}{% static 'reptile/images/normal.jpg' %}{% elif day.record.condition == 2 %}{% static 'reptile/images/bad.jpg' %}{% endif %}">
 
-                                                    {# モーダルで表示用 #}
-                                                    {% if day.record.condition == 0 %}
-                                                        data-condition-img="{% static 'reptile/images/good.jpg' %}"
-                                                    {% elif day.record.condition == 1 %}
-                                                        data-condition-img="{% static 'reptile/images/normal.jpg' %}"
-                                                    {% elif day.record.condition == 2 %}
-                                                        data-condition-img="{% static 'reptile/images/bad.jpg' %}"
-                                                    {% endif %}>
 
                                                 {# カレンダーに表示するボタン用 #}
                                                 {% if day.record.condition == 0 %}
@@ -215,7 +171,7 @@
                     <p class="mb-2"><strong>日付:</strong> <span id="modalDate" class="ms-2 text-secondary"></span></p>
                     <p class="mb-2"><strong>体重:</strong> <span id="modalWeight" class="ms-2 text-secondary"></span></p>
                     <p class="mb-2"><strong>給餌:</strong> <span id="modalFeeding" class="ms-2 text-secondary"></span></p>
-                    <p class="mb-2"><strong>フン:</strong> <span id="modalPoop" class="ms-2 text-secondary"></span></p>
+                    <p class="mb-2"><strong>フン:</strong> <span id="modalfeces" class="ms-2 text-secondary"></span></p>
                     <p class="mb-2"><strong>脱皮:</strong> <span id="modalShedding" class="ms-2 text-secondary"></span></p>
                     <p class="mb-2"><strong>お世話:</strong> <span id="modalCare" class="ms-2 text-secondary"></span></p>
                     <p class="mb-0"><strong>メモ:</strong> </p>
@@ -226,9 +182,11 @@
     </div>
 </div>
 
-{# カレンダーのボタンが持っているデータをモーダルに入れる #}
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
 
+{% block extra_js %}
+
+{# カレンダーのボタンが持っているデータをモーダルに入れる #}
 <script>
     /* モーダル本体（#recordDetailModal）を、JavaScriptで操作できるよう変数に入れる　*/
     const recordModal = document.getElementById('recordDetailModal');
@@ -242,7 +200,7 @@
             const petName = button.getAttribute('data-pet-name');
             const weight = button.getAttribute('data-weight');
             const feeding = button.getAttribute('data-feeding');
-            const poop = button.getAttribute('data-poop');
+            const feces = button.getAttribute('data-feces');
             const shedding = button.getAttribute('data-shedding');
             const care = button.getAttribute('data-care');
             const memo = button.getAttribute('data-memo');
@@ -253,7 +211,7 @@
             document.getElementById('modalDate').textContent = date;
             document.getElementById('modalWeight').textContent = weight;
             document.getElementById('modalFeeding').textContent = feeding;
-            document.getElementById('modalPoop').textContent = poop;
+            document.getElementById('modalfeces').textContent = feces;
             document.getElementById('modalShedding').textContent = shedding;
             document.getElementById('modalCare').textContent = care;
             document.getElementById('modalMemo').textContent = memo;
@@ -277,5 +235,4 @@
     }
 </script>
 
-</body>
-</html>
+{% endblock %}

@@ -1,103 +1,222 @@
+{% extends "reptile/reptile_base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang='ja'>
-<head>
-    <meta charset='UTF-8'>
-    <title>お世話記録登録</title>
-    
-    <link 
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" 
-    rel="stylesheet">
 
-    <style>
-        :root {
-            --bs-primary: #2e7d32;
-            --bs-primary-text-emphasis: #2e7d32;
-            --bs-primary-rgb: 46, 125, 50;
-        }
-        /* ラジオボタンを非表示にする */
-        .condition-choice input[type='radio']{
-            display: none;
-        }
-        .condition-img {
-            cursor: pointer; /* 画像をクリックできるように変更 */
-            border: 3px solid transparent; /* 後で枠線を出すために透明な枠を作成 */
-            border-radius: 10px; /* 画像の角を丸く */
-            padding: 5px; /* 内側に余白 */
-            transition: all 0.2s; /* 0.2秒で変化する */
-        }
-        /* マウスを乗せたとき画像のサイズを1.1倍にする */
-        .condition-img:hover {
-            transform: scale(1.1);
-        }
-        /* condition-choiceクラスの中からラジオボタンにチェックした後ろの画像に緑の枠線をつける */
-        .condition-choice input[type='radio']:checked + .condition-img{
-            border-color: #198754;
-        }
-    </style>
-</head>
+{% block title %}Reptinote - お世話記録登録{% endblock %}
 
-<body class="bg-light py-5">
+{% block extra_css %}
 
-<div class="container" style="max-width: 600px;">
-     <div class="card shadow-sm p-4 bg-white rounded">
-         <h2 class="mb-4 text-center text-primary">お世話の記録</h2>
+/* ラジオボタンを非表示にする */
+.condition-choice input[type="radio"]{
+    display: none;
+}
+.condition-img {
+    cursor: pointer; /* 画像をクリックできるように変更 */
+    border: 3px solid transparent; /* 後で枠線を出すために透明な枠を作成 */
+    border-radius: 10px; /* 画像の角を丸く */
+    padding: 5px; /* 内側に余白 */
+    transition: all 0.2s; /* 0.2秒で変化する */
+}
+/* マウスを乗せたとき画像のサイズを1.1倍にする */
+.condition-img:hover {
+    transform: scale(1.1);
+}
+/* condition-choiceクラスの中からラジオボタンにチェックした後ろの画像に緑の枠線をつける */
+.condition-choice input[type="radio"]:checked + .condition-img{
+    border-color: #198754;
+}
+/* 写真アップロード用のグレーの箱 */
+.photo-upload-box {
+    width: 150px;
+    height:150px;
+    background-color: #e0e0e0;
+    border: 2px dashed #9e9e9e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 2rem;
+    color: #757575;
+    transition: background-color 0.2s;
+}
+.photo-upload-box:hover {
+    background-color: #d5d5d5
+}
+{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 900px;">
+    <div class="card shadow-sm p-4 bg-white rounded">
+        <h4 class="mb-4 text-center text-primary">お世話記録登録</h4>
          
-         <form method="POST">
-        
+        <form method="POST" enctype="multipart/form-data">
+
             {% csrf_token %}
 
-            <div class='mb-4'>
-                <label class='form-label fw-bold'>日付</label>
-                {{ form.record_date }}
-            </div>
+            <div class="mb-4">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <label class="form-label fw-bold">日付</label>
+                    {{ form.record_date }}
+                </div>
 
-            <div class='mb-4'>
-                <label class='form-label fw-bold'>ペットの名前</label>
-                {{ form.reptile }}
-            </div>
-
-            <div class='mb-4'>
-                <label class='form-label fw-bold d-block'>元気</label>
-                <div class='d-flex justify-content-around align-items-center bg-light p-3 rounded'>
-            
-                    <label class='condition-choice text-center'>
-                        <input type='radio' name='condition' value='0'required>
-                        <img src='{% static 'reptile/images/good.jpg' %}' alt='元気' class='condition-img' width='80' height='80'>
-                        <small class='d-block mt-1'>元気</small>
-                    </label>
-
-                    <label class='condition-choice text-center'>
-                        <input type='radio' name='condition' value='1'>
-                        <img src='{% static 'reptile/images/normal.jpg' %}' alt='普通' class='condition-img' width='80' height='80'>
-                        <small class='d-block mt-1'>普通</small>
-                    </label>
-
-                    <label class='condition-choice text-center'>
-                        <input type='radio' name='condition' value='2'>
-                        <img src='{% static 'reptile/images/bad.jpg' %}' alt='元気がない' class='condition-img' width='80' height='80'>
-                        <small class='d-block mt-1'>元気がない</small>
-                    </label>
-
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">ペットの名前</label>
+                    {{ form.reptile }}
                 </div>
             </div>
 
-            <div class='mb-4'> 
-                <label class='form-label fw-bold'>{{ form.care_types.label }}</label>
-                <div class='ps-2'> 
-                    {{ form.care_types }}
+            <hr class="mb-4">
+
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-dark"><span class="text-danger small me-1">必須</span>元気</label>
+                        <div class="d-flex align-items-center gap-3">
+                            <label class="condition-choice text-center">
+                                <input type="radio" name="condition" value="0">
+                                <img src="{% static 'reptile/images/good.jpg' %}" alt="元気" class="condition-img" width="60" height="60">
+                            </label>
+                            <label class="condition-choice text-center">
+                                <input type="radio" name="condition" value="1" checked>
+                                <img src="{% static 'reptile/images/normal.jpg' %}" alt="普通" class="condition-img" width="60" height="60">
+                            </label>
+                            <label class="condition-choice text-center">
+                                <input type="radio" name="condition" value="2">
+                                <img src="{% static 'reptile/images/bad.jpg' %}" alt="元気がない" class="condition-img" width="60" height="60">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">体重</label>
+                        <div class="input-group" style="max-width: 200px;">
+                            {{ form.weight }}
+                            <span class="input-group-text bg-white border-start-0">g</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">体長</label>
+                        <div class="input-group" style="max-width: 200px;">
+                            {{ form.length }}
+                            <span class="input-group-text bg-white border-start-0">cm</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">給餌</label>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="form-check m-0">
+                                <input type="checkbox" name="feeding" id="id_feeding" class="form-check-input">
+                                <label for="id_feeding" class="form-check-label fw-bold text-secondary">あり</label>
+                            </div>
+                            <div style="flex-grow: 1; max-width: 200px;">
+                                {{ form.food_type_memo }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">フン</label>
+                        <div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" name="feces" value="1" id="id_feces_1" class="form-check-input">
+                                <label for="id_feces_1" class="form-check-label">正常</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" name="feces" value="2" id="id_feces_2" class="form-check-input">
+                                <label for="id_feces_2" class="form-check-label">異常</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6"> {#左右2分割にする#}
+                <div class="mb-4">
+                    <label class="form-label fw-bold">脱皮</label>
+                    <div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="shedding" value="1" id="id_shedding_1" class="form-check-input">
+                            <label for="id_shedding_1" class="form-check-label">白濁</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="shedding" value="2" id="id_shedding_2" class="form-check-input">
+                            <label for="id_shedding_2" class="form-check-label">脱皮</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">お世話</label>
+                    <div class="row g-1">
+                        {% for checkbox in form.care_types %}
+                            <div class="col-6 col-sm-4 col-md-6 col-lg-4">
+                                <div class="form-check">
+                                    {{ checkbox.tag }}
+                                    <label class="form-check-label small">{{ checkbox.choice_label }}</label>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">メモ <span class="text-muted small fw-normal">(最大500文字)</span></label>
+                    {{ form.memo }}
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold d-block">写真 <span class="text-muted small fw-normal">(最大1枚まで)</span></label>
+
+                    <label for="id_image" class="photo-upload-box rounded">
+                        <span>+</span>
+                    </label>
+                    <div class="d-none">
+                        {{ form.image }}
+                    </div>
                 </div>
             </div>
 
-            <div class='mb-4'>
-                <label class='form-label fw-bold'>メモ</label>
-                {{ form.memo }}
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="d-flex gap-2 justify-content-md-end">
+                        <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm" style="background-color: #89b2cc!important; border-color: #89b2cc!important; color: #fff!important;">登録</button>
+                        <a href="{% url 'calendar_home' %}" class="btn btn-secondary px-4">キャンセル</a>
+                        <button type="button" class="btn btn-danger px-4" style="background-color: #ea9191!important; color: #333!important;">削除</button>
+                    </div>
+                </div>
             </div>
-
-            <button type='submit' class='btn btn-primary w-100 py-2 fw-bold fs-5'>記録を保存する</button>
         </form>
     </div>
 </div>
 
-</body>
-</html>
+<script>
+    {# 脱皮とフンのラジオボタンをもう一度クリックしたら選択解除できる #}
+    document.addEventListener('DOMContentLoaded', function() {
+        ['shedding', 'feces'].forEach(name => {
+            document.querySelectorAll(`input[name="${name}"]`).forEach(radio => {
+                // 最初からチェックが入っている場合は状態を記憶（今回は初期状態未選択なので基本false）
+                if (radio.checked) {
+                    radio.dataset.wasChecked = 'true';
+                }
+                radio.addEventListener('click', function() {
+                    if (this.dataset.wasChecked === 'true') {
+                        this.checked = false;
+                        this.dataset.wasChecked = 'false';
+                    } else {
+                        /*同じグループの全ボタンの記録を一度クリアする*/
+                        document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
+                            r.dataset.wasChecked = 'false';
+                        });
+
+                        /*押されたボタンだけをチェックあり状態に記憶する*/
+                        this.dataset.wasChecked = 'true'
+                    }
+                });
+            });
+        });
+    });
+</script>
+
+
+{% endblock %}

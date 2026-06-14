@@ -79,7 +79,7 @@ class Record(models.Model):
     updated_at = models.DateTimeField(auto_now=True) 
     
     class Meta:
-        db_table = 'recoeds'
+        db_table = 'records'
         verbose_name_plural = '飼育記録'
     
     def __str__(self):

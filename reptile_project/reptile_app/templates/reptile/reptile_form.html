@@ -1,24 +1,18 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>Reptinote - 新しいペットの登録</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --bs-primary: #2e7d32;
-            --bs-primary-text-emphasis: #2e7d32;
-            --bs-primary-rgb: 46, 125, 50;
-            .btn-primary {
-            background-color: #2e7d32 !important; /* ボタンの背景を緑に */
-            border-color: #2e7d32 !important;     /* ボタンの枠線を緑に */
-            color: #ffffff !important;            /* 文字は白に */
-        }
-    </style>
-</head>
+{% extends "reptile/reptile_base.html" %}
+{% load static %}
+
+{% block title %}Reptinote - 新しいペットの登録{% endblock %}
+
+{% block extra_css %}
+.btn-primary {
+    background-color: #2e7d32 !important; /* ボタンの背景を緑に */
+    border-color: #2e7d32 !important;     /* ボタンの枠線を緑に */
+    color: #ffffff !important;            /* 文字は白に */
+}
+{% endblock %}
 
 
-<body class="bg-light">
+{% block content %}
 
 <div class="container mt-5" style="max-width: 600px;">
     <div class="card shadow-sm p-4 bg-white rounded-3 border-0">
@@ -61,5 +55,4 @@
     </div>
 </div>
 
-</body>
-</html>
+{% endblock %}
