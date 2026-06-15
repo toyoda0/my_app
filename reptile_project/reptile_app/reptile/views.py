@@ -94,14 +94,14 @@ def calendar_home(request, year=None, month=None):
     return render(request, 'reptile/calendar_home.html', context)
 
 
-#カレンダーの記録をもって飛んだお世話記録登録画面
+#カレンダーの記録をもって飛んだお世話記録登録の処理
 def record_add(request, year, month, day):
     #URLの数字を日付データに変換
     selected_date = datetime.date(year, month, day)
     
     #保存ボタンが押された時の処理
     if request.method == 'POST':
-        form = RecordForm(request.POST)
+        form = RecordForm(request.POST, request.FILES)
         if form.is_valid():
             #保存する前に日付を上書きしたいからデータベースへの保存はしないで
             record = form.save(commit=False)

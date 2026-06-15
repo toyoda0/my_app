@@ -62,10 +62,10 @@ class Record(models.Model):
     condition = models.IntegerField(choices=CONDITION_CHOICES, default=1, verbose_name='元気')
     weight = models.FloatField(null=True, blank=True, verbose_name='体重(g)')
     length = models.FloatField(null=True, blank=True, verbose_name='体長(cm)')
-    feeding = models.IntegerField(choices=BINARY_CHOICES, default=0, verbose_name='給餌')
+    feeding = models.IntegerField(choices=BINARY_CHOICES, null=True, blank=True, verbose_name='給餌')
     food_type_memo = models.CharField(max_length=100, blank=True, verbose_name='餌の種類')
-    feces = models.IntegerField(choices=FECES_CHOICES, default=1, verbose_name='フン')
-    shedding = models.IntegerField(choices=BINARY_CHOICES, default=0, verbose_name='脱皮')
+    feces = models.IntegerField(choices=FECES_CHOICES, null=True, blank=True, verbose_name='フン')
+    shedding = models.IntegerField(choices=BINARY_CHOICES, null=True, blank=True, verbose_name='脱皮')
     
     care_types = models.ManyToManyField(
         CareType,
@@ -84,5 +84,3 @@ class Record(models.Model):
     
     def __str__(self):
         return f"{self.record_date} - {self.reptile.name}"
-
-

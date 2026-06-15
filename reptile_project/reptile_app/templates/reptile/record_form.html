@@ -50,9 +50,29 @@
          
         <form method="POST" enctype="multipart/form-data">
 
+
+
+
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    <ul>
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+
+
             {% csrf_token %}
 
-            <div class="mb-4">
+            <div class="row mb-4">
                 <div class="col-md-6 mb-3 mb-md-0">
                     <label class="form-label fw-bold">日付</label>
                     {{ form.record_date }}
@@ -107,7 +127,7 @@
                         <label class="form-label fw-bold">給餌</label>
                         <div class="d-flex align-items-center gap-3">
                             <div class="form-check m-0">
-                                <input type="checkbox" name="feeding" id="id_feeding" class="form-check-input">
+                                <input type="checkbox" name="feeding" value="1" id="id_feeding" class="form-check-input">
                                 <label for="id_feeding" class="form-check-label fw-bold text-secondary">あり</label>
                             </div>
                             <div style="flex-grow: 1; max-width: 200px;">
@@ -120,12 +140,12 @@
                         <label class="form-label fw-bold">フン</label>
                         <div>
                             <div class="form-check form-check-inline">
-                                <input type="radio" name="feces" value="1" id="id_feces_1" class="form-check-input">
-                                <label for="id_feces_1" class="form-check-label">正常</label>
+                                <input type="radio" name="feces" value="0" id="id_feces_0" class="form-check-input">
+                                <label for="id_feces_0" class="form-check-label">異常</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input type="radio" name="feces" value="2" id="id_feces_2" class="form-check-input">
-                                <label for="id_feces_2" class="form-check-label">異常</label>
+                                <input type="radio" name="feces" value="1" id="id_feces_1" class="form-check-input">
+                                <label for="id_feces_1" class="form-check-label">正常</label>
                             </div>
                         </div>
                     </div>
@@ -136,12 +156,12 @@
                     <label class="form-label fw-bold">脱皮</label>
                     <div>
                         <div class="form-check form-check-inline">
-                            <input type="radio" name="shedding" value="1" id="id_shedding_1" class="form-check-input">
-                            <label for="id_shedding_1" class="form-check-label">白濁</label>
+                            <input type="radio" name="shedding" value="0" id="id_shedding_0" class="form-check-input">
+                            <label for="id_shedding_0" class="form-check-label">白濁</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input type="radio" name="shedding" value="2" id="id_shedding_2" class="form-check-input">
-                            <label for="id_shedding_2" class="form-check-label">脱皮</label>
+                            <input type="radio" name="shedding" value="1" id="id_shedding_1" class="form-check-input">
+                            <label for="id_shedding_1" class="form-check-label">脱皮</label>
                         </div>
                     </div>
                 </div>
@@ -171,7 +191,8 @@
                     <label for="id_image" class="photo-upload-box rounded">
                         <span>+</span>
                     </label>
-                    <div class="d-none">
+
+                    <div style="width: 0; height: 0; overflow: hidden; opacity: 0;">
                         {{ form.image }}
                     </div>
                 </div>
@@ -191,11 +212,11 @@
 </div>
 
 <script>
-    {# 脱皮とフンのラジオボタンをもう一度クリックしたら選択解除できる #}
     document.addEventListener('DOMContentLoaded', function() {
+        /*脱皮とフンのラジオボタンをもう一度クリックしたら選択解除できる*/
         ['shedding', 'feces'].forEach(name => {
             document.querySelectorAll(`input[name="${name}"]`).forEach(radio => {
-                // 最初からチェックが入っている場合は状態を記憶（今回は初期状態未選択なので基本false）
+                /*最初からチェックが入っている場合は状態を記憶（今回は初期状態未選択なので基本false）*/
                 if (radio.checked) {
                     radio.dataset.wasChecked = 'true';
                 }
@@ -215,6 +236,24 @@
                 });
             });
         });
+
+        /*写真を選択したらグレーの箱の中にプレビューを表示*/
+        const imageInput = document.getElementById('id_image');
+        const uploadBox = document.querySelector('.photo-upload-box');
+        
+        if (imageInput && uploadBox) {
+            imageInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        /*グレーの箱の中身（+マークなど）を消して、選択された画像を表示する*/
+                        uploadBox.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover;" class="rounded">`;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
     });
 </script>
 
