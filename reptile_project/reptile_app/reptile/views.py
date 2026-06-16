@@ -170,3 +170,21 @@ def reptile_detail(request, pk):
         'sex_display': sex_display,
     }
     return render(request, 'reptile/reptile_detail.html', context)
+
+
+#お世話記録の修正
+def record_edit(request, pk):
+    #URLから渡されたID(pk)を元に、編集したい過去の記録を1件取得
+    record = get_object_or_404(Record, pk=pk)
+    
+    if request.method == "POST":
+        #instance=record を渡すことで「新規登録」ではなく「上書き保存」にする
+        form = RecordForm(request.POST, request.FILES, instance=record)
+        if form.is_valid():
+            form.save()
+            return redirect('calendar_home')
+    else:
+        #過去のデータが最初から入った状態のフォームを作る
+        form = RecordForm(instance=record)
+        
+    return render(request, 'record_edit.html', {'form': form, 'record':record})
