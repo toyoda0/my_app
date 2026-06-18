@@ -15,5 +15,5 @@ urlpatterns = [
     #ペット詳細
     path('reptile/<int:pk>', views.reptile_detail, name='reptile_detail'),
     #お世話編集
-    path('record/edit/<int:pk>/', views.record_edit, name='record_edit'),
+    path('record/edit/<int:record_id>/', views.record_edit, name='record_edit'),
 ]

@@ -122,15 +122,15 @@
                                                     {# data-feeding: 給餌のあり・なし #}
                                                     data-feeding="{% if day.record.feeding %}あり{% else %}なし{% endif %}"
                                                     {# data-feces: フンの状態（0なら正常） #}
-                                                    data-feces="{% if day.record.feces == 0 %}正常{% else %}異常・なし{% endif %}"
+                                                    data-feces="{% if day.record.feces == 0 %}異常{% elif day.record.feces == 1 %}正常{% else %}なし{% endif %}"
                                                     {# data-shedding: 脱皮の状態 #}
-                                                    data-shedding="{% if day.record.get_shedding_display %}{{ day.record.get_shedding_display }}{% else %}なし{% endif %}"
+                                                    data-shedding="{% if day.record.shedding == 0 %}白濁{% elif day.record.shedding == 1 %}脱皮{% else %}なし{% endif %}"
                                                     {# data-care: お世話内容 #}
                                                     data-care="{{ day.record.care|default:'なし' }}"
                                                     {# data-memo: メモ（入力がない時は「（メモなし）」） #}
                                                     data-memo="{{ day.record.memo|default:'(メモなし)' }}"
                                                     {# data-photo: 当日の写真画像（登録されていればそのURL） #}
-                                                    data-photo="{% if day.record.photo %}{{ day.record.photo.url }}{% else %}{% endif %}"
+                                                    data-photo="{% if day.record.image and day.record.image.name %}{{ day.record.image.url }}{% else %}{% endif %}"
                                                     data-condition-img="{% if day.record.condition == 0 %}{% static 'reptile/images/good.jpg' %}{% elif day.record.condition == 1 %}{% static 'reptile/images/normal.jpg' %}{% elif day.record.condition == 2 %}{% static 'reptile/images/bad.jpg' %}{% endif %}">
 
 
@@ -176,16 +176,19 @@
                     <p class="mb-2"><strong>フン:</strong> <span id="modalfeces" class="ms-2 text-secondary"></span></p>
                     <p class="mb-2"><strong>脱皮:</strong> <span id="modalShedding" class="ms-2 text-secondary"></span></p>
                     <p class="mb-2"><strong>お世話:</strong> <span id="modalCare" class="ms-2 text-secondary"></span></p>
+                    <div class="mb-3 text-center d-none" id="modalPhotoWrapper">
+                        <img id="modalPhoto" src="" alt="当日の写真" class="img-fluid rounded" style="max-height: 200px; object-fit: cover;">
+                    </div>
                     <p class="mb-0"><strong>メモ:</strong> </p>
                     <div id="modalMemo" class="p-2 bg-light rounded mt-1 text-secondary" style="font-size: 0.9rem; min-height: 50px;"></div>
                 </div>
             </div>
-            {# モーダルの下に編集ボタンと閉じるボタンを並べるフッターエリアを追加 #}
-            <div class="modal-footer border-0 d-flex justify-content-between" style="background-color: #f8f9fa;">
-                <a id="modalEditBtn" href="#" class="btn btn-warning fw-bold text-dark px-4">
+            {# モーダルの下に編集ボタンを追加 #}
+            <div class="modal-footer border-0 d-flex" style="background-color: #f8f9fa;">
+                <a id="modalEditBtn" href="#" class="btn px-4 fw-bold shadow-sm mx-auto"
+                    style="background-color: #8da99d !important; border-color: #8da99d !important; color: #000 !important; box-shadow: none !important;">
                     <i class="fas fa-edit">編集</i>
                 </a>
-                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">戻る</button>
             </div>
         </div>
     </div>
@@ -215,6 +218,7 @@
             const care = button.getAttribute('data-care');
             const memo = button.getAttribute('data-memo');
             const conditionImg = button.getAttribute('data-condition-img');
+            const photo = button.getAttribute('data-photo');
 
             /*モーダル内の各要素にデータを流し込む*/
             document.getElementById('modalPetName').textContent = petName + 'のお世話記録';
@@ -226,6 +230,19 @@
             document.getElementById('modalCare').textContent = care;
             document.getElementById('modalMemo').textContent = memo;
             document.getElementById('modalConditionImg').src = conditionImg;
+
+            /*写真の表示・非表示の切り替え処理*/
+            const modalPhoto = document.getElementById('modalPhoto');
+            const modalPhotoWrapper = document.getElementById('modalPhotoWrapper');
+
+            if(photo && photo.trim() !== "") {
+                modalPhoto.src = photo; /*写真のURLをセット*/
+                modalPhotoWrapper.classList.remove('d-none'); /*非表示クラスを解除して見せる*/
+            } else {
+                modalPhoto.src = "";
+                modalPhotoWrapper.classList.add('d-none'); /*写真がない日はエリアごと隠す*/
+            }
+
 
             /*モーダルの下に編集ボタンと閉じるボタンを並べるフッターエリアを追加*/
             const editBtn = document.getElementById('modalEditBtn');
