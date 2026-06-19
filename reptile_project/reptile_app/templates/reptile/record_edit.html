@@ -225,15 +225,28 @@
                     <div class="d-flex gap-2 justify-content-md-end">
                         <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm" style="background-color: #89b2cc!important; border-color: #89b2cc!important; color: #fff!important;">編集</button>
                         <a href="{% url 'calendar_home' %}" class="btn btn-secondary px-4">キャンセル</a>
-                        <button type="button" class="btn btn-danger px-4" style="background-color: #ea9191!important; color: #333!important;">削除</button>
+                        <button type="button" class="btn btn-danger px-4" style="background-color: #ea9191!important; color: #333!important;" onclick="confirmDelete();">削除</button>
                     </div>
                 </div>
             </div>
         </form>
+
+        {#削除用の隠しフォーム#}
+        <form id="delete-form" action="{% url 'record_delete' form.instance.pk %}" method="POST" style="display: none;">
+            {% csrf_token %}
+        </form>
+
     </div>
 </div>
 
 <script>
+    /*削除確認*/
+    function confirmDelete() {
+        if (confirm("このお世話記録を完全に削除しますか？\n (この操作は取り消せません)")) {
+            document.getElementById('delete-form').submit();
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         /*脱皮とフンのラジオボタンをもう一度クリックしたら選択解除できる*/
         ['shedding', 'feces'].forEach(name => {
@@ -313,6 +326,5 @@
 
     });
 </script>
-
 
 {% endblock %}

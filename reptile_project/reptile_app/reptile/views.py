@@ -190,3 +190,16 @@ def record_edit(request, record_id):
         form = RecordForm(instance=record)
         
     return render(request, 'reptile/record_edit.html', {'form': form, 'record':record})
+
+
+#お世話記録の削除
+def record_delete(request, record_id):
+    #該当のお世話記録を取得（なければ404エラー）
+    record = get_object_or_404(Record, id=record_id)
+    
+    if request.method == 'POST':
+        record.delete()
+        return redirect('calendar_home')
+    
+    # 安全のためPOST以外（直リンクなど）でのアクセスは編集画面に戻す
+    return redirect('record_edit', record_id=record_id)
