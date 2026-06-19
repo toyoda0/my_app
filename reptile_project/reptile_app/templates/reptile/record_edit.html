@@ -1,0 +1,318 @@
+{% extends "reptile/reptile_base.html" %}
+{% load static %}
+
+{% block title %}Reptinote - お世話記録編集{% endblock %}
+
+{% block extra_css %}
+
+/* ラジオボタンを非表示にする */
+.condition-choice input[type="radio"]{
+    display: none;
+}
+.condition-img {
+    cursor: pointer; /* 画像をクリックできるように変更 */
+    border: 3px solid transparent; /* 後で枠線を出すために透明な枠を作成 */
+    border-radius: 10px; /* 画像の角を丸く */
+    padding: 5px; /* 内側に余白 */
+    transition: all 0.2s; /* 0.2秒で変化する */
+}
+/* マウスを乗せたとき画像のサイズを1.1倍にする */
+.condition-img:hover {
+    transform: scale(1.1);
+}
+/* condition-choiceクラスの中からラジオボタンにチェックした後ろの画像に緑の枠線をつける */
+.condition-choice input[type="radio"]:checked + .condition-img{
+    border-color: #198754;
+}
+/* 写真アップロード用のグレーの箱 */
+.photo-upload-box {
+    width: 150px;
+    height:150px;
+    background-color: #e0e0e0;
+    border: 2px dashed #9e9e9e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 2rem;
+    color: #757575;
+    transition: background-color 0.2s;
+}
+.photo-upload-box:hover {
+    background-color: #d5d5d5
+}
+{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 900px;">
+    <div class="card shadow-sm p-4 bg-white rounded">
+        <h4 class="mb-4 text-center text-primary">お世話記録編集</h4>
+         
+        <form method="POST" enctype="multipart/form-data">
+
+
+
+            {# 保存できないときのエラー内容を表示 確認用後で消す #}
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    <ul>
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+
+
+            {% csrf_token %}
+
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <label class="form-label fw-bold">日付</label>
+                    {{ form.record_date }}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">ペットの名前</label>
+                    {{ form.reptile }}
+                </div>
+            </div>
+
+            <hr class="mb-4">
+
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-dark"><span class="text-danger small me-1">必須</span>元気</label>
+                        <div class="d-flex align-items-center gap-3">
+                            <label class="condition-choice text-center">
+                                <input type="radio" name="condition" value="0" {% if record.condition == 0 %}checked{% endif %}>
+                                <img src="{% static 'reptile/images/good.jpg' %}" alt="元気" class="condition-img" width="60" height="60">
+                            </label>
+                            <label class="condition-choice text-center">
+                                <input type="radio" name="condition" value="1" {% if record.condition == 1 %}checked{% endif %}>
+                                <img src="{% static 'reptile/images/normal.jpg' %}" alt="普通" class="condition-img" width="60" height="60">
+                            </label>
+                            <label class="condition-choice text-center">
+                                <input type="radio" name="condition" value="2" {% if record.condition == 2 %}checked{% endif %}>
+                                <img src="{% static 'reptile/images/bad.jpg' %}" alt="元気がない" class="condition-img" width="60" height="60">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">体重</label>
+                        <div class="input-group" style="max-width: 200px;">
+                            {{ form.weight }}
+                            <span class="input-group-text bg-white border-start-0">g</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">体長</label>
+                        <div class="input-group" style="max-width: 200px;">
+                            {{ form.length }}
+                            <span class="input-group-text bg-white border-start-0">cm</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">給餌</label>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="form-check m-0">
+                                <input type="checkbox" name="feeding" value="1" id="id_feeding" class="form-check-input" {% if record.feeding %}checked{% endif %}>
+                                <label for="id_feeding" class="form-check-label fw-bold text-secondary">あり</label>
+                            </div>
+                            <div style="flex-grow: 1; max-width: 200px;">
+                                {{ form.food_type_memo }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">フン</label>
+                        <div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" name="feces" value="0" id="id_feces_0" class="form-check-input" {% if record.feces == 0 %}checked{% endif %}>
+                                <label for="id_feces_0" class="form-check-label">異常</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" name="feces" value="1" id="id_feces_1" class="form-check-input" {% if record.feces == 1 %}checked{% endif %}>
+                                <label for="id_feces_1" class="form-check-label">正常</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6"> {#左右2分割にする#}
+                <div class="mb-4">
+                    <label class="form-label fw-bold">脱皮</label>
+                    <div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="shedding" value="0" id="id_shedding_0" class="form-check-input" {% if record.shedding == 0 %}checked{% endif %}>
+                            <label for="id_shedding_0" class="form-check-label">白濁</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="shedding" value="1" id="id_shedding_1" class="form-check-input" {% if record.shedding == 1 %}checked{% endif %}>
+                            <label for="id_shedding_1" class="form-check-label">脱皮</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">お世話</label>
+                    <div class="row g-1">
+                        {% for checkbox in form.care_types %}
+                            <div class="col-6 col-sm-4 col-md-6 col-lg-4">
+                                <div class="form-check">
+                                    {{ checkbox.tag }}
+                                    <label class="form-check-label small">{{ checkbox.choice_label }}</label>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">メモ <span class="text-muted small fw-normal">(最大500文字)</span></label>
+                    {{ form.memo }}
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold d-block">写真 <span class="text-muted small fw-normal">(最大1枚まで)</span></label>
+
+                    {#d-flexでグレーの箱と削除ボタンを横並びに#}
+                    <div class="d-flex align-items-center gap-3">
+
+                        <label for="id_image" class="photo-upload-box rounded">
+                            {#すでに登録されている写真があれば最初から表示。なければ+にする#}
+                            {% if record.image and record.image.name %}
+                                <img src="{{ record.image.url }}" style="width: 100%; height: 100%; object-fit: cover" class="rounded">
+                            {% else %}
+                                <span>+</span>
+                            {% endif %}
+                        </label>
+
+                        {#すでに写真がある場合のみ、削除用のボタン（チェックボックス）を表示#}
+                        {% if record.image and record.image.name %}
+                            <div id="delete-photo-area">
+                                {#Django標準のクリア機能と連動させるため、name属性はフォームの定義（通常 image-clear）に合わせる#}
+                                <input type="checkbox" name="image-clear" id="image-clear_id" class="btn-check" autocomplete="off">
+                                <label class="btn btn-outline-danger btn-sm fw-bold px-3 py-2" for="image-clear_id" id="delete-photo-btn">
+                                    <i class="bi bi-trashme"></i>写真削除
+                                </label>
+                                <div class="text-muted small mt-1" style="font-size: 0.75rem;">※保存時に削除されます</div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    {# 隠されている実際のファイル入力欄 #}
+                    <div style="width: 0; height: 0; overflow: hidden; opacity: 0;">
+                        {{ form.image }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="d-flex gap-2 justify-content-md-end">
+                        <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm" style="background-color: #89b2cc!important; border-color: #89b2cc!important; color: #fff!important;">編集</button>
+                        <a href="{% url 'calendar_home' %}" class="btn btn-secondary px-4">キャンセル</a>
+                        <button type="button" class="btn btn-danger px-4" style="background-color: #ea9191!important; color: #333!important;">削除</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        /*脱皮とフンのラジオボタンをもう一度クリックしたら選択解除できる*/
+        ['shedding', 'feces'].forEach(name => {
+            document.querySelectorAll(`input[name="${name}"]`).forEach(radio => {
+                /*最初からチェックが入っている場合は状態を記憶（今回は初期状態未選択なので基本false）*/
+                if (radio.checked) {
+                    radio.dataset.wasChecked = 'true';
+                }
+                radio.addEventListener('click', function() {
+                    if (this.dataset.wasChecked === 'true') {
+                        this.checked = false;
+                        this.dataset.wasChecked = 'false';
+                    } else {
+                        /*同じグループの全ボタンの記録を一度クリアする*/
+                        document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
+                            r.dataset.wasChecked = 'false';
+                        });
+
+                        /*押されたボタンだけをチェックあり状態に記憶する*/
+                        this.dataset.wasChecked = 'true'
+                    }
+                });
+            });
+        });
+
+        /*写真を選択したらグレーの箱の中にプレビューを表示*/
+        const imageInput = document.getElementById('id_image');
+        const uploadBox = document.querySelector('.photo-upload-box');
+        
+        if (imageInput && uploadBox) {
+            imageInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        /*グレーの箱の中身（+マークなど）を消して、選択された画像を表示する*/
+                        uploadBox.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover;" class="rounded">`;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        /*写真削除ボタンを押したときの見た目の動き*/
+        const clearCheckbox = document.getElementById('image-clear_id');
+        const deleteBtn = document.getElementById('delete-photo-btn');
+
+        if(clearCheckbox && deleteBtn && uploadBox) {
+            clearCheckbox.addEventListener('change', function() {
+                if(this.checked) {
+                    /*削除にチェックが入ったら、ボタンを赤くして箱の中身を「＋」に戻す*/
+                    deleteBtn.classList.remove('btn-outline-danger');
+                    deleteBtn.classList.add('btn-danger');
+                    deleteBtn.innerText = '削除を選択中';
+                    uploadBox.innerHTML = '<span>+</span>'
+                } else {
+                    /*削除ボタンを再度押したら、元の画像を表示し直す*/
+                    deleteBtn.classList.remove('btn-danger');
+                    deleteBtn.classList.add('btn-outline-danger');
+                    deleteBtn.innerText = '写真削除';
+                    {% if record.image and record.image.name %}
+                    uploadBox.innerHTML = `<img src="{{ record.image.url }}" style="width: 100%; height:100%; object-fit: cover;" class="rounded">`;
+                    {% endif %}
+                }
+            });
+
+            /*新しくファイルが選択されたら、削除チェックボックスを自動で解除する*/
+            if (imageInput) {
+                imageInput.addEventListener('change', function() {
+                    clearCheckbox.checked = false;
+                    deleteBtn.classList.remove('btn-danger');
+                    deleteBtn.classList.add('btn-outline-danger');
+                    deleteBtn.innerText = '写真削除';
+                });
+            }
+        }
+
+    });
+</script>
+
+
+{% endblock %}

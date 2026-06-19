@@ -77,7 +77,7 @@ class RecordForm(forms.ModelForm):
             #ペットの選択肢欄を綺麗な形にする
             'reptile': forms.Select(attrs={'class': 'form-control'}),
             'memo': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'image': forms.FileInput(attrs={'id': 'id_image'}),
+            'image': forms.ClearableFileInput(attrs={'id': 'id_image'}),
         }
         
 

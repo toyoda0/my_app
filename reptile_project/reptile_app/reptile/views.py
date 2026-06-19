@@ -173,9 +173,11 @@ def reptile_detail(request, pk):
 
 
 #お世話記録の修正
-def record_edit(request, pk):
-    #URLから渡されたID(pk)を元に、編集したい過去の記録を1件取得
-    record = get_object_or_404(Record, pk=pk)
+def record_edit(request, record_id):
+    #URLから渡されたIDと、ログインユーザーを元に、安全に過去の記録を1件取得
+    #get_object_or_404を使うことで、存在しないIDや他人の記録だったら自動で404エラーにする
+    #Recordからreptileを辿って、その先のownerが今のログインユーザー（request.user）
+    record = get_object_or_404(Record, id=record_id, reptile__owner=request.user)
     
     if request.method == "POST":
         #instance=record を渡すことで「新規登録」ではなく「上書き保存」にする
@@ -187,4 +189,4 @@ def record_edit(request, pk):
         #過去のデータが最初から入った状態のフォームを作る
         form = RecordForm(instance=record)
         
-    return render(request, 'record_edit.html', {'form': form, 'record':record})
+    return render(request, 'reptile/record_edit.html', {'form': form, 'record':record})
