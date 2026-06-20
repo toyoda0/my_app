@@ -13,9 +13,11 @@ urlpatterns = [
     #ペット一覧
     path('reptiles/', views.reptile_list, name='reptile_list'),
     #ペット詳細
-    path('reptile/<int:pk>', views.reptile_detail, name='reptile_detail'),
+    path('reptile/<int:record_id>/', views.reptile_detail, name='reptile_detail'),
     #お世話編集
     path('record/edit/<int:record_id>/', views.record_edit, name='record_edit'),
     #お世話削除
     path('record/<int:record_id>/delete/', views.record_delete, name='record_delete'),
+    #ペットの詳細編集
+    path('reptile/edit/<int:record_id>/', views.reptile_edit, name='reptile_edit'),
 ]

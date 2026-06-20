@@ -159,9 +159,9 @@ def reptile_list(request):
         return render(request, 'reptile/reptile_list.html', {'reptiles': reptiles})
     
     
-def reptile_detail(request, pk):
+def reptile_detail(request, record_id):
     # データベースから指定されたID（pk）のペットを1匹だけ取得。なければ404エラー（画面がありません）を返す
-    reptile = get_object_or_404(Reptile, pk=pk, owner=request.user)
+    reptile = get_object_or_404(Reptile, id=record_id, owner=request.user)
     # 性別の数字（0, 1, 2）を、モデルで定義した文字（不明, 男の子, 女の子）に変換する
     sex_display = reptile.get_sex_display()
     
@@ -174,7 +174,7 @@ def reptile_detail(request, pk):
 
 #お世話記録の修正
 def record_edit(request, record_id):
-    #URLから渡されたIDと、ログインユーザーを元に、安全に過去の記録を1件取得
+    #URLから渡されたIDと、ログインユーザーを元に、過去の記録を1件取得
     #get_object_or_404を使うことで、存在しないIDや他人の記録だったら自動で404エラーにする
     #Recordからreptileを辿って、その先のownerが今のログインユーザー（request.user）
     record = get_object_or_404(Record, id=record_id, reptile__owner=request.user)
@@ -203,3 +203,26 @@ def record_delete(request, record_id):
     
     # 安全のためPOST以外（直リンクなど）でのアクセスは編集画面に戻す
     return redirect('record_edit', record_id=record_id)
+
+
+#ペットの詳細編集
+def reptile_edit(request, record_id):
+    #他人に勝手に編集されないよう、owner=request.user も含めて安全に取得
+    reptile = get_object_or_404(Reptile, id=record_id, owner=request.user)
+    
+    if request.method == 'POST':
+        #instance=reptileを渡して既存データの上書き保存
+        form = ReptileForm(request.POST, instance=reptile)
+        if form.is_valid():
+            form.save()
+            #編集が終わったら、そのペットの詳細画面に戻す
+            return redirect('reptile_detail', record_id=reptile.id)
+    else:
+        #過去のデータが最初から入った状態のフォームを作る
+        form = ReptileForm(instance=reptile)
+        
+    context = {
+        'form': form,
+        'reptile': reptile,
+    }
+    return render(request, 'reptile/reptile_edit.html', context)

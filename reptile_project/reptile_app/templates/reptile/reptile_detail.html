@@ -71,7 +71,7 @@
         </div>
 
         <div class="d-flex justify-content-center gap-3 mt-4 pt-3 border-top">
-            <a href="#" class="btn btn-secondary px-5 py-2 fw-bold" style="background-color: #90b4bc; border: none;">編集</a>
+            <a href="{% url 'reptile_edit' record_id=reptile.id %}" class="btn btn-secondary px-5 py-2 fw-bold" style="background-color: #90b4bc; border: none;">編集</a>
             <a href="{% url 'reptile_list' %}" class="btn btn-secondary px-5 py-2 fw-bold" style="background-color: #c4c4c4; border: none; color: black;">戻る</a>
         </div>
     </div>
