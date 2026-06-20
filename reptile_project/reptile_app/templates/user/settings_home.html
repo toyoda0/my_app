@@ -1,0 +1,44 @@
+{% extends "reptile/reptile_base.html" %}
+{% load static %}
+
+{% block title %}Reptinote - 設定{% endblock %}
+
+{% block extra_css %}
+.setting-link {
+    color: #212529 !important; 
+    text-decoration: underline !important;
+    transition: color 0.2s ease-in-out;
+}
+.setting-link:hover {
+    color: #2e7d32 !important;
+}
+{% endblock %}
+
+{% block active_settings %}text-decoration-underline text-primary{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 600px;">
+    <h3 class="fw-bold text-dark mb-4">設定</h3>
+
+    <div class="card shadow-sm p-4 bg-white rounded-3 border-0">
+        <div class="d-flex flex-column gap-4 fs-5" style="padding-left: 1rem;">
+
+            <div>
+                <a href="{% url 'user:password_change' %}" class="setting-link">パスワード変更</a>
+            </div>
+
+            <div>
+                <a href="{% url 'user:email_change' %}" class="setting-link">メールアドレス変更</a>
+            </div>
+
+            <div>
+                <a href="{% url 'invite_add' %}" class="setting-link">招待用URL発行</a>
+            </div>
+
+            <div>
+                <a href="{% url 'member_list' %}" class="setting-link">共有しているメンバー一覧</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

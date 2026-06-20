@@ -126,4 +126,21 @@ def reset_password(request, token):
     return render(request,'user/password_reset_confirm.html', context={
         'form': form, 'message': message,
     })
-    
+
+
+#設定画面
+@login_required
+def settings_home(request):
+    return render(request, 'user/settings_home.html')
+
+
+#パスワード変更（エラー防止用の仮のビュー）
+@login_required
+def password_change(request):
+    return render(request, 'user/settings_home.html') # 今は仮で設定トップに飛ばす
+
+
+#メールアドレス変更（エラー防止用の仮のビュー）
+@login_required
+def email_change(request):
+    return render(request, 'user/settings_home.html') # 今は仮で設定トップに飛ばす
