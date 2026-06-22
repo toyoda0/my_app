@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import CreateView
-from django.urls import reverse_lazy
-from .models import Record, Reptile
+from .models import Record, Reptile, ReptileInvite, UserShare
 from .forms import RecordForm
 from django import forms
 import datetime, calendar
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 
 
 def calendar_home(request, year=None, month=None):
@@ -136,7 +136,8 @@ class ReptileForm(forms.ModelForm):
             }),
         } 
 
-#ログインユーザーを飼い主にして個体追加        
+#ログインユーザーを飼い主にして個体追加
+@login_required
 def reptile_add(request):
     if request.method == 'POST':
         form = ReptileForm(request.POST)
@@ -152,13 +153,15 @@ def reptile_add(request):
     return render(request, 'reptile/reptile_form.html', {'form': form})
 
 
+@login_required
 def reptile_list(request):
     #ログインしているユーザーが飼っているペットだけを一覧で取得
         reptiles = Reptile.objects.filter(owner=request.user)
         
         return render(request, 'reptile/reptile_list.html', {'reptiles': reptiles})
     
-    
+
+@login_required    
 def reptile_detail(request, record_id):
     # データベースから指定されたID（pk）のペットを1匹だけ取得。なければ404エラー（画面がありません）を返す
     reptile = get_object_or_404(Reptile, id=record_id, owner=request.user)
@@ -226,3 +229,60 @@ def reptile_edit(request, record_id):
         'reptile': reptile,
     }
     return render(request, 'reptile/reptile_edit.html', context)
+
+
+#招待用URL発行
+@login_required
+def invite_url_add(request):
+    #画面を最初に開いた（まだ作成ボタンを押していない）ときは、URLが存在しないのでNone
+    generated_url = None
+    
+    if request.method == 'POST':
+        #ReptileInvite モデルを使って、新しいデータをデータベースに1件登録（create）
+        #inviter=request.user：いまログインしてボタンを押したユーザーを招待した人として記録
+        invite = ReptileInvite.objects.create(inviter=request.user)
+        current_host = request.get_host()
+        scheme = request.scheme
+        generated_url = f"{scheme}://{current_host}/share/accept/{invite.token}/"
+        
+    context = {
+        'generated_url': generated_url
+    }
+    return render(request, 'reptile/invite_url_add.html', context)
+
+
+#共有しているメンバー一覧
+@login_required
+def member_list(request):
+    return render(request, 'reptile/member_list.html', {})
+
+
+#招待URLを踏んだユーザーを user_shares に登録
+@login_required
+def invite_accept(request, token):
+    
+    # データベースからまだ使われていないトークンを探す
+    invite = get_object_or_404(ReptileInvite, token=token, used_at__isnull=True)
+    inviter = invite.inviter
+    
+    # 自分のURLなら何もせずカレンダーへ戻す
+    if inviter == request.user:
+        return redirect('calendar_home')
+    
+    if request.method == 'POST':
+        #user_shares テーブルにデータを1件作ってグループを繋ぐ
+        UserShare.objects.get_or_create(
+            owner_user=inviter,
+            shared_user=request.user
+        )
+        
+        #招待リンクを使用済みにする
+        invite.used_at = timezone.now()
+        invite.save()
+        
+        return redirect('calendar_home')
+    
+    context = {
+        'inviter': inviter,
+    }
+    return render(request, 'reptile/invite_accept.html', context)

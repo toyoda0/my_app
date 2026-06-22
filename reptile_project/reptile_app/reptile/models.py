@@ -1,5 +1,7 @@
+import uuid
 from django.db import models
 from django.conf import settings
+from django.contrib.auth import get_user_model
 
 class Reptile(models.Model):
     
@@ -84,3 +86,37 @@ class Record(models.Model):
     
     def __str__(self):
         return f"{self.record_date} - {self.reptile.name}"
+
+
+User = get_user_model()
+
+#招待リンク状態を管理する
+class ReptileInvite(models.Model):
+    #誰が招待URLを作ったか
+    inviter = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_invites')
+    #URLの末尾につけるランダム文字列
+    token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    #発行日時
+    created_at = models.DateTimeField(auto_now_add=True)
+    #使用済みフラグ
+    used_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        db_table = 'invitations'
+    
+    def __str__(self):
+        return f"{self.inviter.email}の招待トークン"
+
+
+#確定した共有関係を管理する
+class UserShare(models.Model):
+    owner_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='shares_as_owner')
+    shared_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='shares_as_guest')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'user_shares'
+        
+    def __str__(self):
+        return f"{self.owner_user.email}"

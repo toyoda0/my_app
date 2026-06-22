@@ -21,7 +21,9 @@ urlpatterns = [
     #ペットの詳細編集
     path('reptile/edit/<int:record_id>/', views.reptile_edit, name='reptile_edit'),
     #招待用URL発行
-    path('share/invite/', views.invite_url_add, name='invite_add'),
+    path('share/invite/', views.invite_url_add, name='invite_url_add'),
     #共有しているメンバー一覧
     path('share/members/', views.member_list, name='member_list'),
+    #招待URLの受け取り用URL
+    path('share/accept/<uuid:token>/', views.invite_accept, name='invite_accept')
 ]

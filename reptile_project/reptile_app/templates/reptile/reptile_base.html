@@ -22,6 +22,10 @@
         .nav-link-custom:hover {
             color: #1b5e20;
         }
+        .nav-link-custom.text-primary {
+            color: #2e7d32 !important;
+            text-decoration: underline !important;
+        }
         {% block extra_css %}{% endblock %}
     </style>
 </head>
@@ -35,11 +39,11 @@
 
         {# 横1列で並べて、左側のマージンを最大に #}
         <div class="d-flex ms-auto">
-            <a href="{% url 'reptile_list' %}" class="nav-link-custom px-3">ペット</a>
+            <a href="{% url 'reptile_list' %}" class="nav-link-custom px-3 {% block active_pet %}{% endblock %}">ペット</a>
             {# メニューの文字を強調して選んでるのが分かるように #}
-            <a href="{% url "calendar_home" %}" class="nav-link-custom px-3 text-decoration-underline text-primary">カレンダー</a>
+            <a href="{% url "calendar_home" %}" class="nav-link-custom px-3 {% block active_calendar %}{% endblock %}">カレンダー</a>
             {# 行き先仮に#にしたから後で追記すること #}
-            <a href="#" class="nav-link-custom px-3">設定</a>
+            <a href="{% url "user:settings_home" %}" class="nav-link-custom px-3 {% block active_settings %}{% endblock %}">設定</a>
             {# text-dangerで赤文字にして注意するように #}
             <a href="{% url 'user:logout' %}" class="nav-link-custom px-3 text-danger">ログアウト</a>
         </div>

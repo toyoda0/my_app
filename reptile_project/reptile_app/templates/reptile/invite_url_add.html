@@ -1,0 +1,56 @@
+{% extends "reptile/reptile_base.html" %}
+
+{% block title %}Reptinote- 招待URLの発行{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 600px;">
+    <h3 class="fw-bold text-dark mb-4">招待用URL発行</h3>
+
+    <div class="card shadow-sm p-4 bg-white rounded-3 border-0">
+        <p class="text-secondary">
+            利用方法:
+                作成をクリックし、リンク先URLを表示
+                招待したい人にリンク先を共有しアカウントに登録してもらう。
+                ※発行されたURLは一度利用すると失効します。
+
+        </p>
+
+        <form method="POST" class="mt-4 mb-4">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold shadow-sm">
+                <i class="bi bi-link-45deg"></i>招待URLを作成する
+            </button>
+        </form>
+
+        {% if generated_url %}
+        <div class="mt-4 p-3 rounded-3 border" style="background-color: #f8f9fa;">
+            <label class="form-label fw-bold text-primary small">作成された招待URL</label>
+            <p class="text-muted small">※このURLは一度誰かが登録すると使えなくなります。</p>
+
+            <div class="input-group">
+                <input type="text" id="inviteUrl" class="form-control bg-white" value="{{ generated_url }}" readonly>
+                <button class="btn btn-outline-primary" type="button" onclick="copyUrl()">
+                    <i class="bi bi-clipboard"></i>コピー
+                </button>
+            </div>
+            <span id="copyMessage" class="text-primary small d-block mt-2" style="display: none !important;">コピーしました</span>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function copyUrl() {
+    var copyText = document.getElementById("inviteUrl");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(copyText, value);
+
+    var msg = document.getElementById('copyMessage');
+    msg.style.setProperty("display", "block", "important");
+    setTimeout(function() {
+        msg.style.setProperty("display", "none", "important");
+    }, 2000);
+}
+</script>
+{% endblock %}

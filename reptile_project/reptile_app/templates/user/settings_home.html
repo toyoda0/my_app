@@ -3,6 +3,8 @@
 
 {% block title %}Reptinote - 設定{% endblock %}
 
+{% block active_settings %}text-decoration-underline text-primary{% endblock %}
+
 {% block extra_css %}
 .setting-link {
     color: #212529 !important; 
@@ -14,7 +16,6 @@
 }
 {% endblock %}
 
-{% block active_settings %}text-decoration-underline text-primary{% endblock %}
 
 {% block content %}
 <div class="container mt-5" style="max-width: 600px;">
@@ -32,7 +33,7 @@
             </div>
 
             <div>
-                <a href="{% url 'invite_add' %}" class="setting-link">招待用URL発行</a>
+                <a href="{% url 'invite_url_add' %}" class="setting-link">招待用URL発行</a>
             </div>
 
             <div>
