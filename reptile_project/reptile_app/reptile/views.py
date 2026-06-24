@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 
 
+@login_required
 def calendar_home(request, year=None, month=None):
     #ログイン後に最初に表示されるカレンダー画面
     today = datetime.date.today()
@@ -176,6 +177,7 @@ def reptile_detail(request, record_id):
 
 
 #お世話記録の修正
+@login_required
 def record_edit(request, record_id):
     #URLから渡されたIDと、ログインユーザーを元に、過去の記録を1件取得
     #get_object_or_404を使うことで、存在しないIDや他人の記録だったら自動で404エラーにする
@@ -196,6 +198,7 @@ def record_edit(request, record_id):
 
 
 #お世話記録の削除
+@login_required
 def record_delete(request, record_id):
     #該当のお世話記録を取得（なければ404エラー）
     record = get_object_or_404(Record, id=record_id)
@@ -209,6 +212,7 @@ def record_delete(request, record_id):
 
 
 #ペットの詳細編集
+@login_required
 def reptile_edit(request, record_id):
     #他人に勝手に編集されないよう、owner=request.user も含めて安全に取得
     reptile = get_object_or_404(Reptile, id=record_id, owner=request.user)
@@ -254,21 +258,41 @@ def invite_url_add(request):
 #共有しているメンバー一覧
 @login_required
 def member_list(request):
-    return render(request, 'reptile/member_list.html', {})
+    #自分がオーナーとして共有しているユーザー一覧を取得
+    shared_members = UserShare.objects.filter(owner_user=request.user)
+    
+    context = {
+        'shared_members': shared_members
+    }
+    return render(request, 'reptile/member_list.html', context)
+
+
+#共有解除
+@login_required
+def share_delete(request, share_id):
+    if request.method == 'POST':
+        #自分がオーナーのデータのみ削除可能
+        share = get_object_or_404(UserShare, id=share_id, owner_user=request.user)
+        share.delete()
+    return redirect('member_list')
 
 
 #招待URLを踏んだユーザーを user_shares に登録
-@login_required
 def invite_accept(request, token):
     
     # データベースからまだ使われていないトークンを探す
     invite = get_object_or_404(ReptileInvite, token=token, used_at__isnull=True)
     inviter = invite.inviter
     
-    # 自分のURLなら何もせずカレンダーへ戻す
+    #もしURLを踏んだ人がまだログインしていない場合
+    if not request.user.is_authenticated:
+        return redirect(f'/user/regist/?token={token}')
+    
+    #自分のURLなら何もせずカレンダーへ戻す
     if inviter == request.user:
         return redirect('calendar_home')
     
+    #参加確認画面で参加ボタンが押されたとき（POST）
     if request.method == 'POST':
         #user_shares テーブルにデータを1件作ってグループを繋ぐ
         UserShare.objects.get_or_create(
@@ -282,7 +306,36 @@ def invite_accept(request, token):
         
         return redirect('calendar_home')
     
+    #最初にURLを踏んで、確認画面を表示するとき（GET）
     context = {
         'inviter': inviter,
     }
     return render(request, 'reptile/invite_accept.html', context)
+
+
+#招待URLから参加
+def signup(request):
+    token = request.GET.get('token')
+    
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user) # 登録と同時にログイン
+            
+            #招待トークンがあれば自動で共有グループに結びつける
+            if token:
+                invite = ReptileInvite.objects.filter(token=token, used_at__isnull=True).first()
+                if invite and invite.inviter != user:
+                    UserShare.objects.get_or_create(
+                        owner_user=invite.inviter,
+                        shared_user=user
+                    )
+                    invite.used_at = timezone.now()
+                    invite.save()
+                    
+            return redirect('calendar_home')
+    else:
+         form = UserCreationForm()
+         
+    return render(request, 'user/signup.html', {'form': form, 'token': token})

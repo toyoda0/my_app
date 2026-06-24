@@ -5,10 +5,10 @@
 {% if user_form.errors %}
 <div style="color: red; margin-bottom: 20px">
     <strong>登録に失敗しました。以下の内容を確認してください: </strong>
-    {{ user_form.non_firld_errors }}
+    {{ user_form.non_field_errors }}
 </div>
 {% endif %}
-<form method="POST">
+<form method="POST" action="?token={{ token|default:'' }}">
     {% csrf_token %}
     {{ user_form.as_p }}
     <input type="submit" value="登録">

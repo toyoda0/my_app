@@ -7,6 +7,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 import uuid
+from django.utils import timezone
+from reptile.models import ReptileInvite, UserShare
 
 User = get_user_model()
 
@@ -19,21 +21,58 @@ def user_list(request):
 #新規登録処理
 def regist(request):
     
+    #URLの「?token=xxxx」をキャッチする
+    token = request.GET.get('token')
+    
     user_form = forms.UserCreationForm(request.POST or None)
     if user_form.is_valid():
-        # データベースに暗号化保存
-        user_form.save()
-        return redirect('user:login')
+        # データベースに暗号化保存（新しく登録されたユーザーを取得）
+        user = user_form.save()
+        
+        #もし招待トークンを持って登録画面に来ていた場合は自動共有
+        if token:
+            invite = ReptileInvite.objects.filter(token=token, used_at__isnull=True).first()
+            if invite and invite.inviter != user:
+                #自動でUserShareにレコードを作る
+                UserShare.objects.get_or_create(
+                    owner_user=invite.inviter,
+                    shared_user=user
+                )
+                #招待リンクを使用済みにする
+                invite.used_at = timezone.now()
+                invite.save()        
+         
+        #入力された生のパスワードをフォームから取得
+        raw_password = user_form.cleaned_data.get('password1')
+        
+        #カスタムユーザーに合わせて email と raw_password で一度正しく認証する
+        auth_user = authenticate(request, username=user.email, password=raw_password)
+        
+        #認証が成功したら、その認証済みユーザーでログインする
+        if auth_user is not None:
+            login(request, auth_user)
+        else:
+            #認証バックエンドを指定してログイン
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            
+        #ブラウザにログインセッションのCookieを今すぐ強制的に書き込ませる
+        request.session.save()
+                
+        #登録＆自動ログイン＆共有が完了したので、そのまま相手のペットカレンダーへ
+        return redirect('calendar_home')
     
     #もし登録に失敗していたら、ターミナルに表示する
     if request.method == 'POST':
-        print("❌ フォームのバリデーションに失敗しました！")
+        print("フォームのバリデーションに失敗しました")
         print("エラー内容:", user_form.errors)
-    
-    #登録画面に、エラーメッセージなどを渡して画面を表示
+        
+    #登録画面を表示（HTML側にtokenを渡しておく）
     return render(request, 'user/registration.html', context={
         'user_form': user_form,
+        'token': token,
     })
+        
+        
 
 #ログイン処理
 def login_view(request):

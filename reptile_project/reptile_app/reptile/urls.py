@@ -1,5 +1,6 @@
 from django.urls import path
 from .import views
+from django.views.generic import RedirectView
 
 urlpatterns = [
     #カレンダー画面
@@ -24,6 +25,10 @@ urlpatterns = [
     path('share/invite/', views.invite_url_add, name='invite_url_add'),
     #共有しているメンバー一覧
     path('share/members/', views.member_list, name='member_list'),
+    #共有解除
+    path('share/delete/<int:share_id>', views.share_delete, name='share_delete'),
     #招待URLの受け取り用URL
-    path('share/accept/<uuid:token>/', views.invite_accept, name='invite_accept')
+    path('share/accept/<uuid:token>/', views.invite_accept, name='invite_accept'),
+    #トップページ（''）にアクセスが来たら、自動で'calendar_home/'に転送
+    path('', RedirectView.as_view(url='calendar_home/', permanent=False)),
 ]
