@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .import forms
 from .models import PasswordResetToken
 from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
@@ -11,6 +10,7 @@ from django.utils import timezone
 from reptile.models import ReptileInvite, UserShare
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
+from .forms import EmailChangeForm
 
 
 User = get_user_model()
@@ -199,7 +199,22 @@ def password_change(request):
     return render(request, 'user/password_change.html', {'form': form})
 
 
-#メールアドレス変更（エラー防止用の仮のビュー）
+#メールアドレス変更（ログイン済で変更用）
 @login_required
 def email_change(request):
-    return render(request, 'user/settings_home.html') # 今は仮で設定トップに飛ばす
+    #フォームに「ログイン中のユーザー情報（user=request.user）」を渡して初期化
+    form = EmailChangeForm(user=request.user, data=request.POST or None)
+    
+    if request.method == 'POST':
+        if form.is_valid():
+            #新しいメールアドレスをユーザーモデルに保存
+            user = request.user
+            user.email = form.cleaned_data.get('new_email1')
+            user.save()
+            
+            #メッセージを登録
+            messages.success(request, 'メールアドレスを変更しました。')
+            
+            return redirect('user:settings_home')
+        
+    return render(request, 'user/email_change.html', {'form': form})

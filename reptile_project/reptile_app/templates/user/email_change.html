@@ -1,14 +1,20 @@
 {% extends "reptile/reptile_base.html" %}
 {% load static %}
 
-{% block title %}Reptinote - パスワード変更{% endblock %}
+{% block title %}Reptinote - メールアドレス変更{% endblock %}
 
 {% block content %}
 <div class="container mt-5" style="max-width: 600px;">
-    <h3 class="fw-bold text-dark mb-5">パスワード変更</h3>
+    <h3 class="fw-bold text-dark mb-5">メールアドレス変更</h3>
 
     <form method="POST" action="">
         {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger mb-4">
+                {{ form.non_field_errors.0 }}
+            </div>
+        {% endif %}
 
         <div class="d-flex flex-column gap-4 mx-auto" style="max-width: 500px;">
             {% for field in form %}
@@ -43,7 +49,7 @@
 
 <script>
     window.addEventListener('DOMContentLoaded', () => {
-        const inputs = document.querySelectorAll('#deleteForm input, form input[type="password"]');
+        const inputs = document.querySelectorAll('#deleteForm input, form input[type="email"]');
         inputs.forEach(input => input.classList.add('form-control'));
     });
 </script>

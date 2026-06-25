@@ -101,3 +101,38 @@ class SetNewPasswordForm(forms.Form):
         else:
             raise ValidationError('パスワードを設定してください')
         return cleaned_data
+
+
+#メールアドレス変更(ログイン済で変更用)
+class EmailChangeForm(forms.Form):
+    current_email = forms.EmailField(label='現在のメールアドレス', required=True)
+    new_email1 = forms.EmailField(label='新しいメールアドレス', required=True)
+    new_email2 = forms.EmailField(label='メールアドレス再入力', required=True)
+    
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        #現在のメールアドレスを初期値にする
+        self.fields['current_email'].initial = user.email
+        self.fields['current_email'].widget.attrs['readonly'] = True #編集不可にする
+        
+    def clean_current_email(self):
+        current_email = self.cleaned_data.get('current_email')
+        if current_email != self.user.email:
+            raise forms.ValidationError("現在のメールアドレスが一致しません。")
+        return current_email
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        new_email1 = cleaned_data.get('new_email1')
+        new_email2 = cleaned_data.get('new_email2')
+        
+        #新しいアドレス同士が一致しているかチェック
+        if new_email1 and new_email2 and new_email1 != new_email2:
+            raise forms.ValidationError("新しいメールアドレスが一致しません。")
+        
+        #すでに使われているメールアドレスじゃないかチェック
+        if new_email1 and User.objects.filter(email=new_email1).exclude(pk=self.user.pk).exists():
+            raise forms.ValidationError("このメールアドレスはすでに登録されています。")
+        
+        return cleaned_data
