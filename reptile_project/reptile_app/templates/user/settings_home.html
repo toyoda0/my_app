@@ -3,6 +3,7 @@
 
 {% block title %}Reptinote - 設定{% endblock %}
 
+
 {% block active_settings %}text-decoration-underline text-primary{% endblock %}
 
 {% block extra_css %}
@@ -19,6 +20,15 @@
 
 {% block content %}
 <div class="container mt-5" style="max-width: 600px;">
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="mb-4" style="color: red; font-width: bold; font-size: 1.1rem;">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
     <h3 class="fw-bold text-dark mb-4">設定</h3>
 
     <div class="card shadow-sm p-4 bg-white rounded-3 border-0">

@@ -3,12 +3,15 @@ from .import forms
 from .models import PasswordResetToken
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 import uuid
 from django.utils import timezone
 from reptile.models import ReptileInvite, UserShare
+from django.contrib import messages
+from django.contrib.auth.forms import PasswordChangeForm
+
 
 User = get_user_model()
 
@@ -173,10 +176,27 @@ def settings_home(request):
     return render(request, 'user/settings_home.html')
 
 
-#パスワード変更（エラー防止用の仮のビュー）
-@login_required
+#パスワード変更（ログイン済で変更用）
 def password_change(request):
-    return render(request, 'user/settings_home.html') # 今は仮で設定トップに飛ばす
+    #Django標準のフォームに、いまログインしているユーザー（request.user）を紐付ける
+    form = PasswordChangeForm(user=request.user, data=request.POST or None)
+    
+    if request.method == 'POST':
+        if form.is_valid():
+            #パスワードを上書き保存
+            user = form.save()
+            
+            #パスワード変更後にログイン状態が切れるのを防ぐ
+            update_session_auth_hash(request, user)
+            
+            #次の画面（設定画面）に1回だけ表示する完了メッセージを登録
+            messages.success(request, 'パスワードを変更しました。')
+            
+            #設定トップ画面へリダイレクト
+            return redirect('user:settings_home')
+            
+    # フォームに不備がある、または最初に画面を開いた（GET）ときは画面を表示
+    return render(request, 'user/password_change.html', {'form': form})
 
 
 #メールアドレス変更（エラー防止用の仮のビュー）

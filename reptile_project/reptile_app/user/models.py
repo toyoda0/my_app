@@ -44,7 +44,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
     
 
-#パスワード再発行
+#パスワード再発行(ログインできない時用)
 class PasswordResetToken(models.Model):
     #ユーザー1人に対してトークンは1つだけ
     user = models.OneToOneField(
