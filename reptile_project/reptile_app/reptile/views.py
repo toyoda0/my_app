@@ -5,7 +5,8 @@ from django import forms
 import datetime, calendar
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login
 
 @login_required
 def calendar_home(request, year=None, month=None):
@@ -157,9 +158,9 @@ def reptile_add(request):
 @login_required
 def reptile_list(request):
     #ログインしているユーザーが飼っているペットだけを一覧で取得
-        reptiles = Reptile.objects.filter(owner=request.user)
-        
-        return render(request, 'reptile/reptile_list.html', {'reptiles': reptiles})
+    reptiles = Reptile.objects.filter(owner=request.user)
+    
+    return render(request, 'reptile/reptile_list.html', {'reptiles': reptiles})
     
 
 @login_required    
@@ -233,6 +234,21 @@ def reptile_edit(request, record_id):
         'reptile': reptile,
     }
     return render(request, 'reptile/reptile_edit.html', context)
+
+
+#ペットの削除
+@login_required
+def reptile_delete(request, record_id):
+    #他人のペットを削除できないようにowner=request.user
+    reptile = get_object_or_404(Reptile, id=record_id, owner=request.user)
+    
+    #削除ボタンが押された時のみ削除を実行
+    if request.method == 'POST':
+        reptile.delete()
+        return redirect('reptile_list')
+    
+    #直接(GET)でアクセスされた場合は編集画面に戻す
+    return redirect('reptile_list', record_id=record_id)
 
 
 #招待用URL発行

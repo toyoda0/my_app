@@ -21,6 +21,8 @@ urlpatterns = [
     path('record/<int:record_id>/delete/', views.record_delete, name='record_delete'),
     #ペットの詳細編集
     path('reptile/edit/<int:record_id>/', views.reptile_edit, name='reptile_edit'),
+    #ペット削除
+    path('reptile/delete/<int:record_id>/', views.reptile_delete, name='reptile_delete'),
     #招待用URL発行
     path('share/invite/', views.invite_url_add, name='invite_url_add'),
     #共有しているメンバー一覧
