@@ -13,6 +13,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from .forms import EmailChangeForm
 
 
+
 User = get_user_model()
 
 #ユーザー一覧画面
@@ -46,7 +47,7 @@ def regist(request):
                 invite.save()        
          
         #入力された生のパスワードをフォームから取得
-        raw_password = user_form.cleaned_data.get('password1')
+        raw_password = user_form.cleaned_data.get('password')
         
         #カスタムユーザーに合わせて email と raw_password で一度正しく認証する
         auth_user = authenticate(request, username=user.email, password=raw_password)
@@ -72,7 +73,7 @@ def regist(request):
     #登録画面を表示（HTML側にtokenを渡しておく）
     return render(request, 'user/registration.html', context={
         'user_form': user_form,
-        'token': token,
+        'token': token
     })
         
         
@@ -87,8 +88,8 @@ def login_view(request):
         password = login_form.cleaned_data.get('password')
         # メールとパスワードをデータベースと照合（成功したらuserが返される）
         user = authenticate(request, username=email, password=password)
-        #アカウントが有効な状態（is_authenticated）か
-        if user is not None and user.is_authenticated:
+        #アカウントが有効な状態ならログインを通す
+        if user is not None:
             login(request, user)# ログイン処理
             redirect_url = next_url if next_url else 'calendar_home'
             return redirect(redirect_url)
@@ -97,7 +98,7 @@ def login_view(request):
             login_form.add_error('email', 'メールアドレスまたはパスワードが間違っています')
             
     return render(request, 'user/login.html', context={
-        'login_form': login_form,
+        'login_form': login_form
     })
 
 #アプリのトップページ

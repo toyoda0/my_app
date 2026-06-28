@@ -31,7 +31,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     username = models.CharField(max_length=150)
     email = models.EmailField(max_length=255, unique=True)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     
     objects = UserManager()
@@ -53,7 +53,7 @@ class PasswordResetToken(models.Model):
         related_name='password_reset_token',
     )
     token = models.UUIDField(default=uuid.uuid4, db_index=True)
-    used = models.BooleanField(default=False)
+    used = models.BooleanField(default=True)
     
     class Meta:
         db_table = 'password_reset_tokens'

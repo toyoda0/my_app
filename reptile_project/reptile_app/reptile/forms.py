@@ -1,5 +1,5 @@
 from django import forms
-from .models import Record, CareType
+from .models import Record, CareType, RecordCare
 
 class CheckboxIntegerField(forms.IntegerField):
     def to_python(self, value):
@@ -65,14 +65,14 @@ class RecordForm(forms.ModelForm):
         #画面に表示したい項目
         fields = [
             'record_date', 'reptile', 'condition', 'weight', 'length', 
-            'feeding', 'food_type_memo', 'feces', 'shedding', 'care_types', 'memo', 'image'
+            'feeding', 'food_type', 'feces', 'shedding', 'memo', 'image'
         ]
         widgets = {
             'weight': forms.NumberInput(attrs={
                 'class': 'form-control', #入力ボックスの横幅が広がる
                 'placeholder': '00.0'}),
             'length': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '00.0'}),
-            'food_type_memo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '餌の種類'}),
+            'food_type': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '餌の種類'}),
             'record_date': forms.DateInput(attrs={'type':'date', 'class':'form-control'}),
             #ペットの選択肢欄を綺麗な形にする
             'reptile': forms.Select(attrs={'class': 'form-control'}),
@@ -92,7 +92,16 @@ class RecordForm(forms.ModelForm):
         
         if commit:
             instance.save()
-            self.save_m2m()
+            
+            #このレコードに紐づく古いお世話記録（RecordCare）を全部消す（更新対策）
+            RecordCare.objects.filter(record=instance).delete()
+            
+            #画面でチェックされたお世話の種類を1つずつループして手動で登録する
+            selected_cares = self.cleaned_data.get('care_types')
+            if selected_cares:
+                for care in selected_cares:
+                    RecordCare.objects.create(record=instance, care_type=care)
+            
         return instance
 
     def __init__(self, *args, **kwargs):
@@ -103,3 +112,7 @@ class RecordForm(forms.ModelForm):
             self.initial['condition'] = self.instance.condition
             self.initial['feces'] = self.instance.feces
             self.initial['shedding'] = self.instance.shedding
+            
+            #編集画面を開いた時に、登録済みのお世話にチェックを入れる初期化処理
+            already_checked = RecordCare.objects.filter(record=self.instance).values_list('care_type_id', flat=True)
+            self.initial['care_types'] = list(already_checked)

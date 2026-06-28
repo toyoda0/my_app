@@ -8,24 +8,20 @@ User = get_user_model()
 
 #ユーザー新規登録用のフォーム    
 class UserCreationForm(forms.ModelForm):
-    confirm_password = forms.CharField(
-        label='パスワード再入力', widget=forms.PasswordInput()
-    )
-    
     password = forms.CharField(
         label='パスワード', widget=forms.PasswordInput()
     )
     
+    confirm_password = forms.CharField(
+        label='パスワード再入力', widget=forms.PasswordInput()
+    )
+    
     class Meta:
         model = User
-        fields = ('username', 'email')
+        fields = ('username', 'email', 'password', 'confirm_password')
         labels = {
             'username': '名前',
             'email': 'メールアドレス',
-            'password': 'パスワード'
-        }
-        widgets = {
-            'password': forms.PasswordInput()
         }
         
     def clean(self):

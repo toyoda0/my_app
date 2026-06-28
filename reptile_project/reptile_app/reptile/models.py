@@ -10,7 +10,7 @@ class Reptile(models.Model):
         MALE = 1, '男の子'
         FEMALE = 2, '女の子'
         
-    owner = models.ForeignKey(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='reptiles'
@@ -65,16 +65,9 @@ class Record(models.Model):
     weight = models.FloatField(null=True, blank=True, verbose_name='体重(g)')
     length = models.FloatField(null=True, blank=True, verbose_name='体長(cm)')
     feeding = models.IntegerField(choices=BINARY_CHOICES, null=True, blank=True, verbose_name='給餌')
-    food_type_memo = models.CharField(max_length=100, blank=True, verbose_name='餌の種類')
+    food_type = models.CharField(max_length=100, blank=True, verbose_name='餌の種類')
     feces = models.IntegerField(choices=FECES_CHOICES, null=True, blank=True, verbose_name='フン')
     shedding = models.IntegerField(choices=BINARY_CHOICES, null=True, blank=True, verbose_name='脱皮')
-    
-    care_types = models.ManyToManyField(
-        CareType,
-        blank=True,
-        related_name='records',
-        verbose_name='本日のお世話内容'
-    )
     image = models.ImageField(upload_to='records/%y/%m/%d/', null=True, blank=True, verbose_name='写真')
     memo = models.CharField(max_length=500, blank=True, verbose_name='メモ')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -120,3 +113,17 @@ class UserShare(models.Model):
         
     def __str__(self):
         return f"{self.owner_user.email}"
+
+
+class RecordCare(models.Model):
+    record = models.ForeignKey(Record, on_delete=models.CASCADE, related_name='record_cares')
+    care_type = models.ForeignKey(CareType, on_delete=models.CASCADE, related_name='record_cares')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'record_cares'
+        unique_together = ('record', 'care_type') # 同じ記録に同じお世話が重複登録されるのを防ぐ
+        
+    def __str__(self):
+        return f"{self.record.record_date} - {self.care_type.name}"

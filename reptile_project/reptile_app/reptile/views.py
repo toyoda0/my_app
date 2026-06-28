@@ -5,8 +5,9 @@ from django import forms
 import datetime, calendar
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from django.contrib.auth.forms import UserCreationForm
+from user.forms import UserCreationForm
 from django.contrib.auth import login
+from django.db.models import Q
 
 @login_required
 def calendar_home(request, year=None, month=None):
@@ -25,15 +26,25 @@ def calendar_home(request, year=None, month=None):
     cal = calendar.Calendar(firstweekday=6)
     month_days = cal.monthdayscalendar(current_year, current_month)
     
-    #ログイン中のユーザーのペット一覧を取得
-    user_reptiles = Reptile.objects.filter(owner=request.user)
+    #自分が共有してもらっている相手（オーナー）のIDリストを取得
+    shared_owner_ids = UserShare.objects.filter(shared_user=request.user).values_list('owner_user_id', flat=True)
     
-    #画面(URLパラメータ)から選ばれたペットIDを取得
-    #なければ1匹目のペットのIDをデフォルトに
+    #自分のペット、または共有されたペットをまとめて取得
+    user_reptiles = Reptile.objects.filter(
+        Q(user=request.user) | Q(user_id__in=shared_owner_ids)
+    ).distinct()
+    
+    #デフォルトで表示するペット（1匹目）の選び方
     selected_pet_id = request.GET.get('pet_id')
     if not selected_pet_id and user_reptiles.exists():
-        selected_pet_id = user_reptiles.first().id
-        
+        #自分がゲストなら「共有されたペット」を最優先で選ぶ
+        shared_reptiles = user_reptiles.filter(user_id__in=shared_owner_ids)
+        if shared_reptiles.exists():
+            selected_pet_id = shared_reptiles.first().id
+        else:
+            selected_pet_id = user_reptiles.first().id
+
+    
     if selected_pet_id:
         #データベースから今月分のデータを取得してカレンダーの数字と合わせる処理
         #Recordから、表示したい年月、選んだペットに一致する記録をもってくる
@@ -109,10 +120,11 @@ def record_add(request, year, month, day):
             record = form.save(commit=False)
             #URLから取得した日付をセット(最優先)
             record.record_date = selected_date
-            record.save()
-            
-            #多対多(ManyToMany)のデータを保存するための決まり文句
-            form.save_m2m()
+            #フォームに上書きしたインスタンスをもう一度セットする
+            form.instance = record
+            #フォームの save(commit=True) を呼ぶことで、
+            #レコードの保存とお世話（RecordCare）の手動登録が同時に走る
+            form.save(commit=True)
             
             return redirect('calendar_home') #保存したらカレンダー画面に戻る
     else:
@@ -146,7 +158,7 @@ def reptile_add(request):
         if form.is_valid():
             reptile = form.save(commit=False)
             #ログインしているユーザーを飼い主にセット
-            reptile.owner = request.user
+            reptile.user = request.user
             reptile.save()
             return redirect('calendar_home')
     else:
@@ -158,7 +170,7 @@ def reptile_add(request):
 @login_required
 def reptile_list(request):
     #ログインしているユーザーが飼っているペットだけを一覧で取得
-    reptiles = Reptile.objects.filter(owner=request.user)
+    reptiles = Reptile.objects.filter(user=request.user)
     
     return render(request, 'reptile/reptile_list.html', {'reptiles': reptiles})
     
@@ -166,7 +178,7 @@ def reptile_list(request):
 @login_required    
 def reptile_detail(request, record_id):
     # データベースから指定されたID（pk）のペットを1匹だけ取得。なければ404エラー（画面がありません）を返す
-    reptile = get_object_or_404(Reptile, id=record_id, owner=request.user)
+    reptile = get_object_or_404(Reptile, id=record_id, user=request.user)
     # 性別の数字（0, 1, 2）を、モデルで定義した文字（不明, 男の子, 女の子）に変換する
     sex_display = reptile.get_sex_display()
     
@@ -182,8 +194,8 @@ def reptile_detail(request, record_id):
 def record_edit(request, record_id):
     #URLから渡されたIDと、ログインユーザーを元に、過去の記録を1件取得
     #get_object_or_404を使うことで、存在しないIDや他人の記録だったら自動で404エラーにする
-    #Recordからreptileを辿って、その先のownerが今のログインユーザー（request.user）
-    record = get_object_or_404(Record, id=record_id, reptile__owner=request.user)
+    #Recordからreptileを辿って、その先のuserが今のログインユーザー（request.user）
+    record = get_object_or_404(Record, id=record_id, reptile__user=request.user)
     
     if request.method == "POST":
         #instance=record を渡すことで「新規登録」ではなく「上書き保存」にする
@@ -215,8 +227,8 @@ def record_delete(request, record_id):
 #ペットの詳細編集
 @login_required
 def reptile_edit(request, record_id):
-    #他人に勝手に編集されないよう、owner=request.user も含めて安全に取得
-    reptile = get_object_or_404(Reptile, id=record_id, owner=request.user)
+    #他人に勝手に編集されないよう、user=request.user も含めて安全に取得
+    reptile = get_object_or_404(Reptile, id=record_id, user=request.user)
     
     if request.method == 'POST':
         #instance=reptileを渡して既存データの上書き保存
@@ -239,8 +251,8 @@ def reptile_edit(request, record_id):
 #ペットの削除
 @login_required
 def reptile_delete(request, record_id):
-    #他人のペットを削除できないようにowner=request.user
-    reptile = get_object_or_404(Reptile, id=record_id, owner=request.user)
+    #他人のペットを削除できないようにuser=request.user
+    reptile = get_object_or_404(Reptile, id=record_id, user=request.user)
     
     #削除ボタンが押された時のみ削除を実行
     if request.method == 'POST':
