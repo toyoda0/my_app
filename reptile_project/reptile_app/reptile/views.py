@@ -177,9 +177,16 @@ def reptile_list(request):
 
 @login_required    
 def reptile_detail(request, record_id):
-    # データベースから指定されたID（pk）のペットを1匹だけ取得。なければ404エラー（画面がありません）を返す
-    reptile = get_object_or_404(Reptile, id=record_id, user=request.user)
-    # 性別の数字（0, 1, 2）を、モデルで定義した文字（不明, 男の子, 女の子）に変換する
+    #自分がゲストの場合のオーナーIDリスト
+    shared_owner_ids = UserShare.objects.filter(shared_user=request.user).values_list('owner_user_id', flat=True)
+    
+    #自分が飼い主(user)か、または共有してくれたオーナー(user_id__in)のペットなら取得OKにする
+    reptile = get_object_or_404(
+        Reptile,
+        Q(id=record_id) & (Q(user=request.user) | Q(user_id__in=shared_owner_ids))
+    )
+    
+    #性別の数字（0, 1, 2）を、モデルで定義した文字（不明, 男の子, 女の子）に変換する
     sex_display = reptile.get_sex_display()
     
     context = {
@@ -192,10 +199,14 @@ def reptile_detail(request, record_id):
 #お世話記録の修正
 @login_required
 def record_edit(request, record_id):
-    #URLから渡されたIDと、ログインユーザーを元に、過去の記録を1件取得
-    #get_object_or_404を使うことで、存在しないIDや他人の記録だったら自動で404エラーにする
-    #Recordからreptileを辿って、その先のuserが今のログインユーザー（request.user）
-    record = get_object_or_404(Record, id=record_id, reptile__user=request.user)
+    # 自分がゲストの場合のオーナーIDリスト
+    shared_owner_ids = UserShare.objects.filter(shared_user=request.user).values_list('owner_user_id', flat=True)
+    
+    #記録のペットの飼い主が、自分または共有オーナーなら編集OKにする
+    record = get_object_or_404(
+        Record, 
+        Q(id=record_id) & (Q(reptile__user=request.user) | Q(reptile__user_id__in=shared_owner_ids))
+    )
     
     if request.method == "POST":
         #instance=record を渡すことで「新規登録」ではなく「上書き保存」にする
@@ -213,8 +224,14 @@ def record_edit(request, record_id):
 #お世話記録の削除
 @login_required
 def record_delete(request, record_id):
-    #該当のお世話記録を取得（なければ404エラー）
-    record = get_object_or_404(Record, id=record_id)
+    # 自分がゲストの場合のオーナーIDリスト
+    shared_owner_ids = UserShare.objects.filter(shared_user=request.user).values_list('owner_user_id', flat=True)
+    
+    #記録のペットの飼い主が、自分または共有オーナーなら安全に削除できるようにガード
+    record = get_object_or_404(
+        Record,
+        Q(id=record_id) & (Q(reptile__user=request.user) | Q(reptile__user_id__in=shared_owner_ids))
+    )
     
     if request.method == 'POST':
         record.delete()
@@ -227,8 +244,14 @@ def record_delete(request, record_id):
 #ペットの詳細編集
 @login_required
 def reptile_edit(request, record_id):
-    #他人に勝手に編集されないよう、user=request.user も含めて安全に取得
-    reptile = get_object_or_404(Reptile, id=record_id, user=request.user)
+    #自分がゲストの場合のオーナーIDリスト
+    shared_owner_ids = UserShare.objects.filter(shared_user=request.user).values_list('owner_user_id', flat=True)
+    
+    #他人に勝手に編集されないよう、自分または共有オーナーのペットのみ安全に取得
+    reptile = get_object_or_404(
+        Reptile,
+        Q(id=record_id) & (Q(user=request.user) | Q(user_id__in=shared_owner_ids))
+    )
     
     if request.method == 'POST':
         #instance=reptileを渡して既存データの上書き保存
@@ -340,30 +363,3 @@ def invite_accept(request, token):
     }
     return render(request, 'reptile/invite_accept.html', context)
 
-
-#招待URLから参加
-def signup(request):
-    token = request.GET.get('token')
-    
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user) # 登録と同時にログイン
-            
-            #招待トークンがあれば自動で共有グループに結びつける
-            if token:
-                invite = ReptileInvite.objects.filter(token=token, used_at__isnull=True).first()
-                if invite and invite.inviter != user:
-                    UserShare.objects.get_or_create(
-                        owner_user=invite.inviter,
-                        shared_user=user
-                    )
-                    invite.used_at = timezone.now()
-                    invite.save()
-                    
-            return redirect('calendar_home')
-    else:
-         form = UserCreationForm()
-         
-    return render(request, 'user/signup.html', {'form': form, 'token': token})

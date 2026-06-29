@@ -38,7 +38,7 @@
     <div class="pet-list-container">
         {% for reptile in reptiles %}
             {% comment %} そのペットの詳細画面へのリンク張ること {% endcomment %}
-            <a href="{% url 'reptile_detail' reptile.pk %}" class="pet-card shadow-sm">
+            <a href="{% url 'reptile_detail' reptile.id %}" class="pet-card shadow-sm">
                 <div class="d-flex align-items-center">
                     <span class="fw-bold fs-3 me-4">{{ reptile.name }}</span>
                     <span class="text-muted fs-5">{{ reptile.species }}</span>

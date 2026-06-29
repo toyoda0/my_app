@@ -79,6 +79,15 @@ class Record(models.Model):
     
     def __str__(self):
         return f"{self.record_date} - {self.reptile.name}"
+    
+    
+    #お世話のテキストを取得するしてモーダルに表示させる
+    def get_cares_text(self):
+        #持ってきたデータ（複数）をループで1つずつ取り出して、仮に rc と名付けcaresに入れる
+        cares = [rc.care_type.name for rc in self.record_cares.all()]
+        #この記録に紐づくお世話の名前を「、」で繋いだ文字列にする
+        return "、".join(cares) if cares else "なし"
+    
 
 
 User = get_user_model()

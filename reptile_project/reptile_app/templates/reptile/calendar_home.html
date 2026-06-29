@@ -92,8 +92,8 @@
                         {# 先の1週間の中から、さらに1日ずつ（日〜土の7回分）データを取り出して1マスを作る#}
                         {% for day in week %}
 
-                            {#もし今作っているマスが、『今日の日付』と完全に一致したら、このマスにだけ today-box というクラスをつける #}
-                            <td class="p-0 {% if year == today.year and month == today.month and day.day_num == today.day %}today-box{% endif %}" style="height: 100px;">
+                            {#day.day_num > 0 の時だけ今日の背景色判定をするようにガード #}
+                            <td class="p-0 {% if day.day_num > 0 and year == today.year and month == today.month and day.day_num == today.day %}today-box{% endif %}" style="height: 100px;">
 
                                 {# 今月の日付の時（0じゃない）に中身を書く #}
                                 {% if day.day_num > 0 %}
@@ -126,7 +126,7 @@
                                                     {# data-shedding: 脱皮の状態 #}
                                                     data-shedding="{% if day.record.shedding == 0 %}白濁{% elif day.record.shedding == 1 %}脱皮{% else %}なし{% endif %}"
                                                     {# data-care: お世話内容 #}
-                                                    data-care="{{ day.record.care|default:'なし' }}"
+                                                    data-care="{{ day.record.get_cares_text }}"
                                                     {# data-memo: メモ（入力がない時は「（メモなし）」） #}
                                                     data-memo="{{ day.record.memo|default:'(メモなし)' }}"
                                                     {# data-photo: 当日の写真画像（登録されていればそのURL） #}
