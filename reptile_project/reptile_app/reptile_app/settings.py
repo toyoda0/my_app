@@ -142,3 +142,6 @@ LOGIN_URL = '/user/login/'
 LOGIN_REDIRECT_URL = 'calendar_home'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+#メール送信時はターミナルに表示
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

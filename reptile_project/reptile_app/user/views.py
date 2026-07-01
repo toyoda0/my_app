@@ -126,18 +126,18 @@ def request_password_reset(request):
         user = get_object_or_404(User, email=email)
         # 新しいトークンを作成、既存なら取得
         password_reset_token, created = PasswordResetToken.objects.get_or_create(user=user)
-        #過去にリセット申請した古いデータなら新しい文字列に更新して保存
-        if not created:
-            password_reset_token.token = uuid.uuid4()
-            password_reset_token.used = False
-            password_reset_token.save()
+        
+        #新規（created）既存どちらでも、常に新しいUUIDを発行して保存
+        password_reset_token.token = uuid.uuid4()
+        password_reset_token.used = False
+        password_reset_token.save()
             
         #パスワード更新されるまで一時的にアカウント凍結
         user.is_active = False
         user.save()
         token = password_reset_token.token
         #復活URLをプリント→これをユーザーにメールで送る
-        print(f"{request.scheme}://{request.get_host()}/user/reset_password/{token}")
+        print(f"{request.scheme}://{request.get_host()}/user/reset_password/{token}/")
         message = 'パスワードリセットトークンをお送りしました'
         
     return render(request, 'user/password_reset_form.html', context={

@@ -1,10 +1,77 @@
 {% extends "user/base.html" %}
 {% block content %}
-<h1>ログイン画面</h1>
-<form method="POST">
-    {% csrf_token %}
-    {{ login_form.as_p }}
-    <input type="submit" value="送信">
-</form>
-<p><a href="{% url 'user:request_password_reset' %}">パスワード再発行</a></p>
+
+<div class="width: 100%; max-width: 300px; text-align: center;">
+
+    <h2 style="font-weight: bold; color: #212529; margin-bottom: 30px; font-size: 1.5rem; text-align: center;">ログイン</h2>
+
+    <form method="POST" style="margin-bottom: 20px;">
+        {% csrf_token %}
+
+        {# id名を固定し、文字と中身を中央寄せにするスタイルを追加 #}
+        <div id="django-form-container" style="text-align: center; margin-bottom: 25px; width: 100%;">
+            {{ login_form.as_p }}
+        </div>
+
+        <button type="submit"
+            style="background-color: #a4c2f4; color: black; font-weight: bold; border: 1px solid #6c757d; padding: 10px 0; margin-bottom: 20px; width: 180px; font-size: 1.2rem; cursor: pointer; border-radius: 4px; display: inline-block;">
+            ログイン
+        </button>
+    </form>
+
+    <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.95rem; align-items: center; width: 100%; text-align: center;">
+        <div style="width: 100%;">
+            <a href="{% url 'user:regist' %}" style="color: #6c757d; text-decoration: underline; display: inline-block;">新規アカウント登録</a>
+        </div>
+        <div style="width: 100%;">
+            <a href="{% url 'user:request_password_reset' %}" style="color: #6c757d; text-decoration: underline; display: inline-block;">パスワードを忘れた方</a>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        //各項目（pタグ）を完全に中央に集める
+        const paragraphs = document.querySelectorAll('#django-form-container p');
+        paragraphs.forEach(p => {
+            p.style.display = 'flex';
+            p.style.flexDirection = 'column';
+            p.style.alignItems = 'center';
+            p.style.justifyContent = 'center';
+            p.style.margin = '0 0 20px 0';
+            p.style.width = '100%';
+            p.style.textAlign = 'center';
+        });
+
+        //入力ボックス（input）自体の配置と、中に入力する文字も中央寄せにする
+        const inputs = document.querySelectorAll('#django-form-container input');
+        inputs.forEach(input => {
+            input.style.width = '100%';
+            input.style.maxWidth = '380px';
+            input.style.padding = '8px';
+            input.style.border = '1px solid #212529';
+            input.style.borderRadius = '4px';
+            input.style.boxSizing = 'border-box';
+            input.style.textAlign = 'center'; //入力する文字や●●を中央にする
+            input.style.margin = '0 auto';     //ボックス自体を中央に置く
+        });
+
+        //ラベル（「メールアドレス」「パスワード」）の文字を中央にする
+        const labels = document.querySelectorAll('#django-form-container label');
+        labels.forEach(label => {
+            label.style.fontWeight = 'bold';
+            label.style.color = '#495057';
+            label.style.marginBottom = '5px';
+            label.style.fontSize = '1.1rem';
+            label.style.textAlign = 'center';
+            label.style.width = '100%';
+            label.style.maxWidth = '380px';
+            label.style.display = 'block';
+            
+            //後ろについてしまうコロン（：）を消去
+            label.innerText = label.innerText.replace(':', '').replace('：', '');
+        });
+    });
+</script>
 {% endblock %}
