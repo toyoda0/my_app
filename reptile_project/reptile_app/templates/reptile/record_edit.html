@@ -131,7 +131,7 @@
                                 <label for="id_feeding" class="form-check-label fw-bold text-secondary">あり</label>
                             </div>
                             <div style="flex-grow: 1; max-width: 200px;">
-                                {{ form.food_type_memo }}
+                                {{ form.food_type }}
                             </div>
                         </div>
                     </div>
@@ -222,10 +222,21 @@
 
             <div class="row mt-4">
                 <div class="col-12">
-                    <div class="d-flex gap-2 justify-content-md-end">
-                        <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm" style="background-color: #89b2cc!important; border-color: #89b2cc!important; color: #fff!important;">編集</button>
-                        <a href="{% url 'calendar_home' %}" class="btn btn-secondary px-4">キャンセル</a>
-                        <button type="button" class="btn btn-danger px-4" style="background-color: #ea9191!important; color: #333!important;" onclick="confirmDelete();">削除</button>
+                    <div class="d-flex justify-content-center align-items-center mt-5 gap-3">
+                        <button type="submit" class="btn fw-bold text-white d-inline-flex align-items-center justify-content-center" 
+                                style="background-color: #89b2cc !important; border-color: #89b2cc !important; min-width: 130px; height: 38px;">
+                            編集
+                        </button>
+                        
+                        <a href="{% url 'calendar_home' %}" class="btn fw-bold text-dark d-inline-flex align-items-center justify-content-center" 
+                        style="background-color: #c2c2c2 !important; border-color: #c2c2c2 !important; min-width: 130px; height: 38px; text-decoration: none;">
+                            キャンセル
+                        </a>
+                        
+                        <button type="button" class="btn fw-bold text-dark d-inline-flex align-items-center justify-content-center" id="deleteModalTrigger"
+                                style="background-color: #ff9e9e !important; border-color: #ff9e9e !important; min-width: 130px; height: 38px;">
+                            削除
+                        </button>
                     </div>
                 </div>
             </div>

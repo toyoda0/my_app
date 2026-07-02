@@ -137,6 +137,7 @@ def record_add(request, year, month, day):
 class ReptileForm(forms.ModelForm):
     class Meta:
         model = Reptile
+        
         #画面で入力する項目
         fields = ['name', 'species', 'morph', 'sex', 'birthday', 'adoption_date', 'memo']
         #カレンダー入力しやすいように日付の見た目を調整
@@ -148,7 +149,22 @@ class ReptileForm(forms.ModelForm):
                 'rows': 3,
                 'placeholder': 'メモ(最大500文字)'
             }),
-        } 
+        }
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        #instance.pk がある（＝データベースに既に保存されているデータを編集している）場合
+        if self.instance and self.instance.pk:
+            #おわかれ日の入力欄をメモの上に追加
+            self.fields['record_end_date'] = forms.DateField(
+                label='おわかれ日',
+                required=False,
+                widget=forms.DateInput(attrs={'type': 'date'})
+            )
+            
+            #画面の並び順を調整
+            field_order = ['name', 'species', 'morph', 'sex', 'birthday', 'adoption_date', 'record_end_date', 'memo']
+            self.order_fields(field_order)
 
 #ログインユーザーを飼い主にして個体追加
 @login_required
@@ -160,7 +176,7 @@ def reptile_add(request):
             #ログインしているユーザーを飼い主にセット
             reptile.user = request.user
             reptile.save()
-            return redirect('calendar_home')
+            return redirect('reptile_list')
     else:
         form = ReptileForm()
         

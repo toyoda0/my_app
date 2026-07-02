@@ -125,14 +125,12 @@
 
                     <div class="mb-4">
                         <label class="form-label fw-bold">給餌</label>
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="form-check m-0">
+                        <div class="d-flex align-items-center">
+                            <div class="form-check me-2">
                                 <input type="checkbox" name="feeding" value="1" id="id_feeding" class="form-check-input">
                                 <label for="id_feeding" class="form-check-label fw-bold text-secondary">あり</label>
                             </div>
-                            <div style="flex-grow: 1; max-width: 200px;">
-                                {{ form.food_type_memo }}
-                            </div>
+                            <input type="text" name="food_type" class="form-control" style="max-width: 200px;" placeholder="餌の種類" value="{{ form.food_type.value|default:'' }}">
                         </div>
                     </div>
 
@@ -200,10 +198,21 @@
 
             <div class="row mt-4">
                 <div class="col-12">
-                    <div class="d-flex gap-2 justify-content-md-end">
-                        <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm" style="background-color: #89b2cc!important; border-color: #89b2cc!important; color: #fff!important;">登録</button>
-                        <a href="{% url 'calendar_home' %}" class="btn btn-secondary px-4">キャンセル</a>
-                        <button type="button" class="btn btn-danger px-4" style="background-color: #ea9191!important; color: #333!important;">削除</button>
+                    <div class="d-flex justify-content-center align-items-center mt-5 gap-3">
+                        <button type="submit" class="btn fw-bold text-white d-inline-flex align-items-center justify-content-center" 
+                                style="background-color: #83a7b3 !important; border-color: #83a7b3 !important; min-width: 130px; height: 38px;">
+                            登録
+                        </button>
+                        
+                        <a href="{% url 'calendar_home' %}" class="btn fw-bold text-dark d-inline-flex align-items-center justify-content-center" 
+                        style="background-color: #c2c2c2 !important; border-color: #c2c2c2 !important; min-width: 130px; height: 38px; text-decoration: none;">
+                            キャンセル
+                        </a>
+                        
+                        <button type="button" class="btn fw-bold text-dark d-inline-flex align-items-center justify-content-center" id="deleteModalTrigger"
+                                style="background-color: #ff9e9e !important; border-color: #ff9e9e !important; min-width: 130px; height: 38px;">
+                            削除
+                        </button>
                     </div>
                 </div>
             </div>

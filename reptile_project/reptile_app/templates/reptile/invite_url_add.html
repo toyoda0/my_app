@@ -1,4 +1,5 @@
 {% extends "reptile/reptile_base.html" %}
+{% load static %}
 
 {% block title %}Reptinote- 招待URLの発行{% endblock %}
 
@@ -6,18 +7,20 @@
 <div class="container mt-5" style="max-width: 600px;">
     <h3 class="fw-bold text-dark mb-4">招待用URL発行</h3>
 
-    <div class="card shadow-sm p-4 bg-white rounded-3 border-0">
-        <p class="text-secondary">
-            利用方法:
-                作成をクリックし、リンク先URLを表示
-                招待したい人にリンク先を共有しアカウントに登録してもらう。
-                ※発行されたURLは一度利用すると失効します。
+    <div class="alert alert-light border mb-4 text-secondary" style="font-size: 0.95rem; line-height: 1.6;">
+            <p class="fw-bold text-dark mb-2">ご利用方法</p>
+            <ul class="mb-0 ps-3">
+                <li><strong>「招待URLを作成する」</strong>をクリックすると、下に専用のリンクが表示されます。</li>
+                <li>招待したい人にそのURLを共有し、アカウント登録を行ってもらってください。</li>
+                <li class="text-danger">※発行されたURLは一度利用すると失効します。</li>
+            </ul>
+        </div>
 
-        </p>
-
-        <form method="POST" class="mt-4 mb-4">
+        <div class="text-center">
+        <form method="POST">
             {% csrf_token %}
-            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold shadow-sm">
+            <button type="submit" class="btn fw-bold w-100 py-2 shadow-sm text-dark" 
+                style="background-color: #c2c2c2 !important; border-color: #c2c2c2 !important;">
                 <i class="bi bi-link-45deg"></i>招待URLを作成する
             </button>
         </form>
@@ -33,6 +36,13 @@
             <span id="copyMessage" class="text-primary small d-block mt-2" style="display: none !important;">コピーしました</span>
         </div>
         {% endif %}
+
+        <div class="mt-4">
+            <a href="{% url 'user:settings_home' %}" class="text-secondary small text-decoration-underline fw-bold" style="transition: color 0.2s;">
+                キャンセル
+            </a>
+        </div>
+        
     </div>
 </div>
 
