@@ -1,0 +1,55 @@
+<!-- templates/portfolio/portfolio.html の中身 -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>My Portfolio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #fcfcfc; color: #333; }
+        .document-link { font-size: 1.1rem; text-decoration: none; margin: 0 10px; }
+        .document-link:hover { text-decoration: underline; }
+        .app-screenshot {
+            background-color: #ededed; border: 1px solid #ccc;
+            min-height: 300px; display: flex; align-items: center; justify-content: center;
+            font-weight: bold; color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container my-5 text-center" style="max-width: 900px; border: 1px solid #999; padding: 40px; background: white;">
+    
+    <!-- 作品名 -->
+    <h2 class="fw-bold mb-4">Reptinote（レプティノート）</h2>
+
+    <!-- スクショ画像が表示されるエリア -->
+    <div class="app-screenshot mb-4 rounded">
+        アプリのスクショ
+    </div>
+
+    <!-- アプリの簡単な説明 -->
+    <p class="text-start mx-auto mb-4 text-muted" style="max-width: 750px; line-height: 1.8;">
+        Reptinoteは、爬虫類のペットの体調管理やお世話の記録を家族やパートナーと共有できる飼育管理アプリです。
+        日々のお世話を記録し、大切なペットの健康をみんなで見守ることができます。
+    </p>
+
+    <!-- 設計図のリンク -->
+    <div class="mb-5">
+        <a href="/static/docs/planning.pdf" target="_blank" class="document-link">企画書</a>
+        <a href="/static/docs/ui_design.svg" target="_blank" class="document-link">画面設計図</a>
+        <a href="/static/docs/transition.svg" target="_blank" class="document-link">画面遷移図</a>
+        <a href="/static/docs/erd.pdf" target="_blank" class="document-link">ER図</a>
+    </div>
+
+    <div>
+        <a href="/Reptinote/user/login/" class="btn btn-primary px-5 py-3 fw-bold fs-5 shadow-sm" 
+            style="background-color: #5b9bd5; border: none; width: 280px;">
+            このアプリにアクセス
+        </a>
+    </div>
+
+</div>
+
+</body>
+</html>
