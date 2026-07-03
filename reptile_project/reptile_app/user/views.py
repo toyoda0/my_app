@@ -59,7 +59,7 @@ def regist(request):
             #認証バックエンドを指定してログイン
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             
-        #ブラウザにログインセッションのCookieを今すぐ強制的に書き込ませる
+        #ブラウザにログインセッションのCookieを書き込ませる
         request.session.save()
                 
         #登録＆自動ログイン＆共有が完了したので、そのまま相手のペットカレンダーへ
@@ -111,10 +111,6 @@ def logout_view(request):
     logout(request)
     return redirect('user:login')
 
-#ユーザーの会員情報（インフォメーション）画面
-@login_required
-def info(request):
-    return render(request, 'user/info.html')
 
 #パスワードリセットの処理
 def request_password_reset(request):

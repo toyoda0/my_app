@@ -33,7 +33,7 @@ class UserCreationForm(forms.ModelForm):
         if password != confirm_password:
             raise ValidationError('パスワードが一致しません')
         
-        # Djangoの強力なパスワード安全基準（8文字以上など）に合格するかチェック→いるか要確認
+        # パスワード安全基準に合格するかチェック
         try:
             if password:
                 validate_password(password, self.instance)
@@ -44,7 +44,7 @@ class UserCreationForm(forms.ModelForm):
         
     def save(self, commit=True):
         user = super().save(commit=False)
-        # 入力されたパスワードをハッシュ（暗号化）して保存する
+        # 入力されたパスワードを暗号化して保存する
         user.set_password(self.cleaned_data['password'])
         if commit:
             user.save()
@@ -59,7 +59,7 @@ class UserChangeForm(forms.ModelForm):
         fields = ('username', 'email', 'password', 'is_active', 'is_staff', 'is_superuser')
         
     def clean_password(self):
-        return self.instance.password
+        return self.instance.password #現在保存されている元のパスワードを維持して返す（勝手に書き換えさせない）
 
 #ログイン用フォーム
 class UserLoginForm(forms.Form):
@@ -70,6 +70,7 @@ class UserLoginForm(forms.Form):
 class RequestPasswordResetForm(forms.Form):
     email = forms.EmailField(label='メールアドレス', widget=forms.EmailInput())
     
+    #入力されたメールアドレスがデータベースに登録されているかチェック
     def clean_email(self):
         email = self.cleaned_data['email']
         if not User.objects.filter(email=email).exists():
@@ -112,6 +113,7 @@ class EmailChangeForm(forms.Form):
         self.fields['current_email'].initial = user.email
         self.fields['current_email'].widget.attrs['readonly'] = True #編集不可にする
         
+    #ログインしている本人のアドレスと一致するかチェック
     def clean_current_email(self):
         current_email = self.cleaned_data.get('current_email')
         if current_email != self.user.email:

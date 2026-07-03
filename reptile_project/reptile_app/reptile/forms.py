@@ -1,10 +1,11 @@
 from django import forms
 from .models import Record, CareType, RecordCare
+from django.db.models import Q
 
 class CheckboxIntegerField(forms.IntegerField):
     def to_python(self, value):
-        # HTMLでチェックが入っていると 'on' や '1' が届く -> 1 を返す
-        # チェックがない、または空データなら -> 0 を返す
+        # HTMLでチェックが入っているとTrue(またはonや1)が届く:1を返す
+        # チェックがない、または空データなら0を返す
         if value in ('on', '1', True):
             return 1
         return 0
@@ -14,6 +15,7 @@ class CheckboxIntegerField(forms.IntegerField):
         pass
 
 
+#お世話記録フォーム
 class RecordForm(forms.ModelForm):
     
     #元気 (0, 1, 2) を文字列として受け取ってバリデーションを通す
@@ -104,8 +106,22 @@ class RecordForm(forms.ModelForm):
             
         return instance
 
+    #編集画面を開いた時の初期化
     def __init__(self, *args, **kwargs):
+        #呼び出し元（views.py）から user を受け取るようにする
+        user = kwargs.pop('user', None) 
         super().__init__(*args, **kwargs)
+        
+        #もし user が渡されてきたら、選択肢をその人のペット（＋共有されたペット）だけに絞り込む
+        if user:
+            from reptile.models import Reptile, UserShare
+            # 自分がオーナーのペット、または自分に共有されているオーナーのペットのIDを集める
+            shared_owners = UserShare.objects.filter(shared_user=user).values_list('owner_user_id', flat=True)
+            # 自分のペット、または共有相手のペットだけをドロップダウンに出す
+            self.fields['reptile'].queryset = Reptile.objects.filter(
+                Q(user=user) | Q(user__in=shared_owners)
+            )
+            
         # 編集画面の時に、初期値を正しくチェックボックスやラジオボタンに反映させる処理
         if self.instance and self.instance.pk:
             self.initial['feeding'] = (self.instance.feeding == 1)

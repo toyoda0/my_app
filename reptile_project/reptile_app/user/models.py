@@ -27,6 +27,7 @@ class UserManager(BaseUserManager):
         extra_fields['is_superuser'] = True
         return self.create_user(email, username, password, **extra_fields)
 
+#データベースに保存される「ユーザー（アカウント）」そのもののテーブルの設計
 class User(AbstractBaseUser, PermissionsMixin):
     
     username = models.CharField(max_length=150)
@@ -50,10 +51,10 @@ class PasswordResetToken(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,  #Userから変更　参照先を設定依存
         on_delete=models.CASCADE,
-        related_name='password_reset_token',
+        related_name='password_reset_token', #逆参照用の名前
     )
     token = models.UUIDField(default=uuid.uuid4, db_index=True)
-    used = models.BooleanField(default=True)
+    used = models.BooleanField(default=True) #tokenが使われたか判定
     
     class Meta:
         db_table = 'password_reset_tokens'

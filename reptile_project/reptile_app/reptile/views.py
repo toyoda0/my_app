@@ -9,6 +9,7 @@ from user.forms import UserCreationForm
 from django.contrib.auth import login
 from django.db.models import Q
 
+#カレンダー画面
 @login_required
 def calendar_home(request, year=None, month=None):
     #ログイン後に最初に表示されるカレンダー画面
@@ -37,7 +38,7 @@ def calendar_home(request, year=None, month=None):
     #デフォルトで表示するペット（1匹目）の選び方
     selected_pet_id = request.GET.get('pet_id')
     if not selected_pet_id and user_reptiles.exists():
-        #自分がゲストなら「共有されたペット」を最優先で選ぶ
+        #自分がゲストなら「共有されたペット」を選ぶ
         shared_reptiles = user_reptiles.filter(user_id__in=shared_owner_ids)
         if shared_reptiles.exists():
             selected_pet_id = shared_reptiles.first().id
@@ -108,13 +109,14 @@ def calendar_home(request, year=None, month=None):
 
 
 #カレンダーの記録をもって飛んだお世話記録登録の処理
+@login_required
 def record_add(request, year, month, day):
     #URLの数字を日付データに変換
     selected_date = datetime.date(year, month, day)
     
     #保存ボタンが押された時の処理
     if request.method == 'POST':
-        form = RecordForm(request.POST, request.FILES)
+        form = RecordForm(request.POST, request.FILES, user=request.user)
         if form.is_valid():
             #保存する前に日付を上書きしたいからデータベースへの保存はしないで
             record = form.save(commit=False)
@@ -129,11 +131,12 @@ def record_add(request, year, month, day):
             return redirect('calendar_home') #保存したらカレンダー画面に戻る
     else:
         #最初に画面を表示しただけの時の処理
-        form = RecordForm(initial={'record_date': selected_date})
+        form = RecordForm(initial={'record_date': selected_date}, user=request.user)
             
     return render(request, 'reptile/record_form.html', {'form': form, 'selected_date': selected_date})
 
 
+#ペット登録
 class ReptileForm(forms.ModelForm):
     class Meta:
         model = Reptile
@@ -162,7 +165,7 @@ class ReptileForm(forms.ModelForm):
                 widget=forms.DateInput(attrs={'type': 'date'})
             )
             
-            #画面の並び順を調整
+            #画面の並び順を再調整
             field_order = ['name', 'species', 'morph', 'sex', 'birthday', 'adoption_date', 'record_end_date', 'memo']
             self.order_fields(field_order)
 
@@ -183,6 +186,7 @@ def reptile_add(request):
     return render(request, 'reptile/reptile_form.html', {'form': form})
 
 
+#ペット一覧
 @login_required
 def reptile_list(request):
     #ログインしているユーザーが飼っているペットだけを一覧で取得
@@ -191,6 +195,7 @@ def reptile_list(request):
     return render(request, 'reptile/reptile_list.html', {'reptiles': reptiles})
     
 
+#ペット詳細
 @login_required    
 def reptile_detail(request, record_id):
     #自分がゲストの場合のオーナーIDリスト
@@ -226,7 +231,7 @@ def record_edit(request, record_id):
     
     if request.method == "POST":
         #instance=record を渡すことで「新規登録」ではなく「上書き保存」にする
-        form = RecordForm(request.POST, request.FILES, instance=record)
+        form = RecordForm(request.POST, request.FILES, instance=record, user=request.user)
         if form.is_valid():
             form.save()
             return redirect('calendar_home')
@@ -290,7 +295,7 @@ def reptile_edit(request, record_id):
 #ペットの削除
 @login_required
 def reptile_delete(request, record_id):
-    #他人のペットを削除できないようにuser=request.user
+    #他人(ゲストも)のペットを削除できないようにuser=request.user
     reptile = get_object_or_404(Reptile, id=record_id, user=request.user)
     
     #削除ボタンが押された時のみ削除を実行
@@ -299,7 +304,7 @@ def reptile_delete(request, record_id):
         return redirect('reptile_list')
     
     #直接(GET)でアクセスされた場合は編集画面に戻す
-    return redirect('reptile_list', record_id=record_id)
+    return redirect('reptile_list')
 
 
 #招待用URL発行
@@ -313,7 +318,7 @@ def invite_url_add(request):
         #inviter=request.user：いまログインしてボタンを押したユーザーを招待した人として記録
         invite = ReptileInvite.objects.create(inviter=request.user)
         current_host = request.get_host()
-        scheme = request.scheme
+        scheme = request.scheme #通信の接続方式
         generated_url = f"{scheme}://{current_host}/share/accept/{invite.token}/"
         
     context = {
@@ -347,11 +352,11 @@ def share_delete(request, share_id):
 #招待URLを踏んだユーザーを user_shares に登録
 def invite_accept(request, token):
     
-    # データベースからまだ使われていないトークンを探す
+    #有効なトークンかチェック（使用済みや存在しない場合は404）
     invite = get_object_or_404(ReptileInvite, token=token, used_at__isnull=True)
     inviter = invite.inviter
     
-    #もしURLを踏んだ人がまだログインしていない場合
+    #ログインしていない場合は、トークンを持たせて登録・ログイン画面へ
     if not request.user.is_authenticated:
         return redirect(f'/user/regist/?token={token}')
     
@@ -359,23 +364,15 @@ def invite_accept(request, token):
     if inviter == request.user:
         return redirect('calendar_home')
     
-    #参加確認画面で参加ボタンが押されたとき（POST）
-    if request.method == 'POST':
-        #user_shares テーブルにデータを1件作ってグループを繋ぐ
-        UserShare.objects.get_or_create(
-            owner_user=inviter,
-            shared_user=request.user
-        )
-        
-        #招待リンクを使用済みにする
-        invite.used_at = timezone.now()
-        invite.save()
-        
-        return redirect('calendar_home')
+    #user_shares テーブルにデータを1件作ってグループを繋ぐ
+    UserShare.objects.get_or_create(
+        owner_user=inviter,
+        shared_user=request.user
+    )
     
-    #最初にURLを踏んで、確認画面を表示するとき（GET）
-    context = {
-        'inviter': inviter,
-    }
-    return render(request, 'reptile/invite_accept.html', context)
-
+    #招待リンクを使用済みにする
+    invite.used_at = timezone.now()
+    invite.save()
+    
+    #登録が完了したらカレンダーへ
+    return redirect('calendar_home')

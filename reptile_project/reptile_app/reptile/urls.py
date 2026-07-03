@@ -2,6 +2,7 @@ from django.urls import path
 from .import views
 from django.views.generic import RedirectView
 
+
 urlpatterns = [
     #カレンダー画面
     path('calendar_home/', views.calendar_home, name='calendar_home'),
