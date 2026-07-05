@@ -9,7 +9,8 @@ User = get_user_model()
 #ユーザー新規登録用のフォーム    
 class UserCreationForm(forms.ModelForm):
     password = forms.CharField(
-        label='パスワード', widget=forms.PasswordInput()
+        label='パスワード', widget=forms.PasswordInput(),
+        help_text='※10文字以上・英数字を含めて入力してください。'
     )
     
     confirm_password = forms.CharField(
