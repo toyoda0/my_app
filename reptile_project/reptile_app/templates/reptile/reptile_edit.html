@@ -58,7 +58,7 @@
                     完了
                 </button>
                 
-                <a href="{% url 'reptile_detail' record_id=reptile.id %}" class="btn fw-bold text-dark d-inline-flex align-items-center justify-content-center" 
+                <a href="{% url 'reptile:reptile_detail' record_id=reptile.id %}" class="btn fw-bold text-dark d-inline-flex align-items-center justify-content-center" 
                    style="background-color: #c2c2c2 !important; border-color: #c2c2c2 !important; min-width: 130px; height: 38px; text-decoration: none;">
                     キャンセル
                 </a>
@@ -77,7 +77,7 @@
 
         <h5 class="fw-bold text-dark mb-4" style="line-height: 1.6;">入力内容を削除しても<br>よろしいですか？</h5>
 
-        <form id="deleteForm" method="POST" action="{% url 'reptile_delete' record_id=reptile.id %}">
+        <form id="deleteForm" method="POST" action="{% url 'reptile:reptile_delete' record_id=reptile.id %}">
             {% csrf_token %}
 
             <div class="d-flex flex-column gap-3 align-items-center">

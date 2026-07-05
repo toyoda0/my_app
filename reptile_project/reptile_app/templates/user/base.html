@@ -36,24 +36,7 @@
         </style>
     </head>
     <body>
-        <nav>
-            {% if user.is_authenticated %}
-                <a href="{% url 'user:index' %}">ホーム</a>
-                <a href="{% url 'user:info' %}">ユーザー画面</a>
-                <form action="{% url 'user:logout' %}" method="POST" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" style="background: none; border: none; color: #007bff; text-decoration: underline; cursor: pointer; padding: 0; font-size: 1rem;">ログアウト</button>
-                </form>
-            {% endif %}
-        </nav>
-        
-
-        /*チェック用 後で消すこと*/
-        <p style="padding: 5px 10px; margin: 0; font-size: 0.8rem; color: #6c757d;">
-            デバッグ状態：{{ user }}:{{ user.is_authenticated }}
-        </p>
-        
-
+        {#各画面の中身を真ん中に#}
         <div class="main-center-container">
             {% block content %}
             {% endblock %}

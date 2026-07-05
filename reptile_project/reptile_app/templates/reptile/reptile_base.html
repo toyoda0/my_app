@@ -35,13 +35,13 @@
 <nav class="navbar navbar-expand shadow-sm" style="background-color: #a5d6a7;">
     {# 横幅を整えるための内側の箱 #}
     <div class="container"> 
-        <a class="navbar-brand fw-bold text-primary fs-3" href="{% url 'calendar_home' %}">Reptinote</a>
+        <a class="navbar-brand fw-bold text-primary fs-3" href="{% url 'reptile:calendar_home' %}">Reptinote</a>
 
         {# 横1列で並べて、左側のマージンを最大に #}
         <div class="d-flex ms-auto">
-            <a href="{% url 'reptile_list' %}" class="nav-link-custom px-3 {% block active_pet %}{% endblock %}">ペット</a>
+            <a href="{% url 'reptile:reptile_list' %}" class="nav-link-custom px-3 {% block active_pet %}{% endblock %}">ペット</a>
             {# メニューの文字を強調して選んでるのが分かるように #}
-            <a href="{% url 'calendar_home' %}" class="nav-link-custom px-3 {% block active_calendar %}{% endblock %}">カレンダー</a>
+            <a href="{% url 'reptile:calendar_home' %}" class="nav-link-custom px-3 {% block active_calendar %}{% endblock %}">カレンダー</a>
             {# 行き先仮に#にしたから後で追記すること #}
             <a href="{% url 'user:settings_home' %}" class="nav-link-custom px-3 {% block active_settings %}{% endblock %}">設定</a>
             {# text-dangerで赤文字にして注意するように #}

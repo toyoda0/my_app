@@ -31,14 +31,14 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold text-secondary m-0" style="font-size: 1.5rem;">ペット一覧</h2>
-        <a href="{% url 'reptile_add' %}" class="fw-bold text-primary fs-5">ペット追加</a>
+        <a href="{% url 'reptile:reptile_add' %}" class="fw-bold text-primary fs-5">ペット追加</a>
     </div>
 
     {% comment %} ペットを並べる外枠 {% endcomment %}
     <div class="pet-list-container">
         {% for reptile in reptiles %}
             {% comment %} そのペットの詳細画面へのリンク張ること {% endcomment %}
-            <a href="{% url 'reptile_detail' reptile.id %}" class="pet-card shadow-sm">
+            <a href="{% url 'reptile:reptile_detail' reptile.id %}" class="pet-card shadow-sm">
                 <div class="d-flex align-items-center">
                     <span class="fw-bold fs-3 me-4">{{ reptile.name }}</span>
                     <span class="text-muted fs-5">{{ reptile.species }}</span>

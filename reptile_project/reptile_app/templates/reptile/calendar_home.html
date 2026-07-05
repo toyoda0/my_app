@@ -50,11 +50,11 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             {# 年月を表示する見出しタグ #}
             <h3 class="fw-bold text-dark m-0">
-                <a href="{% url 'calendar_move' prev_year prev_month %}" class='text-decoration-none text-primary'>◀</a>
+                <a href="{% url 'reptile:calendar_move' prev_year prev_month %}" class='text-decoration-none text-primary'>◀</a>
 
                 {{ year }}年 {{ month }}月
 
-                <a href="{% url 'calendar_move' next_year next_month %}" class='text-decoration-none text-primary'>▶</a>
+                <a href="{% url 'reptile:calendar_move' next_year next_month %}" class='text-decoration-none text-primary'>▶</a>
             </h3>
 
             {# セレクトボックスが広がりすぎないよう固定 #}
@@ -98,7 +98,7 @@
                                 {# 今月の日付の時（0じゃない）に中身を書く #}
                                 {% if day.day_num > 0 %}
 
-                                    <a href="{% url 'record_add_with_date' year month day.day_num %}" class="date-link">
+                                    <a href="{% url 'reptile:record_add_with_date' year month day.day_num %}?pet_id={{ selected_pet_id }}" class="date-link">
                                         <span class="p-2" style="align-self: flex-start;">{{ day.day_num }}</span>
                                     </a>                                    
 
@@ -249,7 +249,7 @@
             /*HTMLに編集ボタンが存在し、かつクリックされた顔マークからIDが無事に読み取れたなら*/
             if (editBtn && recordId) {
                 /*href="#"の編集ボタンの行き先に入れる*/
-                editBtn.href = `/record/edit/${recordId}/`;
+                editBtn.href = `/Reptinote/record/edit/${recordId}/`;
             }
 
         });

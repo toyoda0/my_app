@@ -63,7 +63,7 @@ def regist(request):
         request.session.save()
                 
         #登録＆自動ログイン＆共有が完了したので、そのまま相手のペットカレンダーへ
-        return redirect('calendar_home')
+        return redirect('reptile:calendar_home')
     
     #もし登録に失敗していたら、ターミナルに表示する
     if request.method == 'POST':
@@ -91,7 +91,7 @@ def login_view(request):
         #アカウントが有効な状態ならログインを通す
         if user is not None:
             login(request, user)# ログイン処理
-            redirect_url = next_url if next_url else 'calendar_home'
+            redirect_url = next_url if next_url else 'reptile:calendar_home'
             return redirect(redirect_url)
         else:
             # エラーメッセージをメールアドレスの欄に出す
@@ -132,10 +132,14 @@ def request_password_reset(request):
         user.is_active = False
         user.save()
         token = password_reset_token.token
+        
         #復活URLをプリント→これをユーザーにメールで送る
-        print(f"{request.scheme}://{request.get_host()}/user/reset_password/{token}/")
+        print(f"{request.scheme}://{request.get_host()}/Reptinote/user/reset_password/{token}/")
         message = 'パスワードリセットトークンをお送りしました'
         
+        return redirect('user:password_reset_done')
+    
+    #最初に画面を開いた（GET）とき、またはエラーがあるときは元の入力画面を出す    
     return render(request, 'user/password_reset_form.html', context={
         'reset_form': form, 'message': message,
     })
@@ -215,3 +219,8 @@ def email_change(request):
             return redirect('user:settings_home')
         
     return render(request, 'user/email_change.html', {'form': form})
+
+
+#パスワード再設定メール送付完了
+def password_reset_done(request):
+    return render(request, 'user/password_reset_done.html')

@@ -52,7 +52,7 @@
 
 
 
-            {# 保存できないときのエラー内容を表示 確認用後で消す #}
+            {# 保存できないときのエラー内容を表示 確認用 #}
             {% if form.errors %}
                 <div class="alert alert-danger">
                     <ul>
@@ -203,10 +203,10 @@
                         {#すでに写真がある場合のみ、削除用のボタン（チェックボックス）を表示#}
                         {% if record.image and record.image.name %}
                             <div id="delete-photo-area">
-                                {#Django標準のクリア機能と連動させるため、name属性はフォームの定義（通常 image-clear）に合わせる#}
+                                {#Django標準のクリア機能と連動させるため、name属性はフォームの定義（image-clear）に合わせる#}
                                 <input type="checkbox" name="image-clear" id="image-clear_id" class="btn-check" autocomplete="off">
                                 <label class="btn btn-outline-danger btn-sm fw-bold px-3 py-2" for="image-clear_id" id="delete-photo-btn">
-                                    <i class="bi bi-trashme"></i>写真削除
+                                    <i class="bi bi-trash"></i>写真削除
                                 </label>
                                 <div class="text-muted small mt-1" style="font-size: 0.75rem;">※保存時に削除されます</div>
                             </div>
@@ -228,41 +228,51 @@
                             編集
                         </button>
                         
-                        <a href="{% url 'calendar_home' %}" class="btn fw-bold text-dark d-inline-flex align-items-center justify-content-center" 
+                        <a href="{% url 'reptile:calendar_home' %}" class="btn fw-bold text-dark d-inline-flex align-items-center justify-content-center" 
                         style="background-color: #c2c2c2 !important; border-color: #c2c2c2 !important; min-width: 130px; height: 38px; text-decoration: none;">
                             キャンセル
                         </a>
                         
                         <button type="button" class="btn fw-bold text-dark d-inline-flex align-items-center justify-content-center" id="deleteModalTrigger"
-                                style="background-color: #ff9e9e !important; border-color: #ff9e9e !important; min-width: 130px; height: 38px;">
+                                style="background-color: #fca5a5; color: black; border: none; width: 130px; height: 38px; border-radius: 4px;">
                             削除
                         </button>
                     </div>
                 </div>
             </div>
         </form>
+    </div>
+</div>
 
-        {#削除用の隠しフォーム#}
-        <form id="delete-form" action="{% url 'record_delete' form.instance.pk %}" method="POST" style="display: none;">
+{#削除確認用モーダル#}
+<div id="deleteModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div class="card p-4 shadow-lg border border-dark" style="width: 400px; text-align: center; background-color: #fafaf5; border-radius: 20px;">
+        <h5 class="fw-bold text-dark mb-4" style="line-height: 1.6;">
+            このお世話記録を削除しますか？<br>
+        </h5>
+
+        <form id="deleteForm" method="POST" action="{% url 'reptile:record_delete' record_id=form.instance.pk %}">
             {% csrf_token %}
+            <div class="d-flex flex-column gap-3 align-items-center">
+                <button type="submit" class="btn px-4 py-2 border border-dark"
+                        style="background-color: #fca5a5; color: black; font-weight: bold; font-size: 1.1rem; width: 160px;">
+                    削除
+                </button>
+                <button type="button" class="btn px-4 py-2 border border-dark" id="modalCancelBtn"
+                        style="background-color: #cccccc; color: black; font-weight: bold; font-size: 1.1rem; width: 160px;">
+                    キャンセル
+                </button>
+            </div>
         </form>
-
     </div>
 </div>
 
 <script>
-    /*削除確認*/
-    function confirmDelete() {
-        if (confirm("このお世話記録を完全に削除しますか？\n (この操作は取り消せません)")) {
-            document.getElementById('delete-form').submit();
-        }
-    }
-
     document.addEventListener('DOMContentLoaded', function() {
         /*脱皮とフンのラジオボタンをもう一度クリックしたら選択解除できる*/
         ['shedding', 'feces'].forEach(name => {
             document.querySelectorAll(`input[name="${name}"]`).forEach(radio => {
-                /*最初からチェックが入っている場合は状態を記憶（今回は初期状態未選択なので基本false）*/
+                /*最初からチェックが入っている場合は状態を記憶*/
                 if (radio.checked) {
                     radio.dataset.wasChecked = 'true';
                 }
@@ -286,6 +296,8 @@
         /*写真を選択したらグレーの箱の中にプレビューを表示*/
         const imageInput = document.getElementById('id_image');
         const uploadBox = document.querySelector('.photo-upload-box');
+        const clearCheckbox = document.getElementById('image-clear_id');	
+        const deleteBtn = document.getElementById('delete-photo-btn');
         
         if (imageInput && uploadBox) {
             imageInput.addEventListener('change', function() {
@@ -298,12 +310,16 @@
                     }
                     reader.readAsDataURL(file);
                 }
+
+                // 新しい写真が選ばれたら削除のチェックを自動で戻す
+                if (clearCheckbox && deleteBtn) {
+                    clearCheckbox.checked = false;
+                    deleteBtn.classList.remove('btn-danger');
+                    deleteBtn.classList.add('btn-outline-danger');
+                    deleteBtn.innerText = '写真削除';
+                }
             });
         }
-
-        /*写真削除ボタンを押したときの見た目の動き*/
-        const clearCheckbox = document.getElementById('image-clear_id');
-        const deleteBtn = document.getElementById('delete-photo-btn');
 
         if(clearCheckbox && deleteBtn && uploadBox) {
             clearCheckbox.addEventListener('change', function() {
@@ -323,19 +339,33 @@
                     {% endif %}
                 }
             });
-
-            /*新しくファイルが選択されたら、削除チェックボックスを自動で解除する*/
-            if (imageInput) {
-                imageInput.addEventListener('change', function() {
-                    clearCheckbox.checked = false;
-                    deleteBtn.classList.remove('btn-danger');
-                    deleteBtn.classList.add('btn-outline-danger');
-                    deleteBtn.innerText = '写真削除';
-                });
-            }
         }
 
-    });
+
+    //モーダル制御用
+    const triggerBtn = document.getElementById('deleteModalTrigger');
+    const cancelBtn = document.getElementById('modalCancelBtn');
+    const modal = document.getElementById('deleteModal');
+
+    if (triggerBtn && cancelBtn && modal) {
+        //「削除」ボタンを押したらモーダルを表示
+        triggerBtn.addEventListener('click', () => {
+            modal.style.display = 'flex';
+        });
+
+        //モーダル内の「キャンセル」ボタンを押したら閉じる
+        cancelBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        //モーダルの外側をクリックしても閉じる
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    }
+});
 </script>
 
 {% endblock %}

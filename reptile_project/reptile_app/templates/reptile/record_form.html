@@ -52,7 +52,7 @@
 
 
 
-            {# 保存できないときのエラー内容を表示 確認用後で消す #}
+            {# 保存できないときのエラー内容を表示 #}
             {% if form.errors %}
                 <div class="alert alert-danger">
                     <ul>
@@ -204,7 +204,7 @@
                             登録
                         </button>
                         
-                        <a href="{% url 'calendar_home' %}" class="btn fw-bold text-dark d-inline-flex align-items-center justify-content-center" 
+                        <a href="{% url 'reptile:calendar_home' %}" class="btn fw-bold text-dark d-inline-flex align-items-center justify-content-center" 
                         style="background-color: #c2c2c2 !important; border-color: #c2c2c2 !important; min-width: 130px; height: 38px; text-decoration: none;">
                             キャンセル
                         </a>

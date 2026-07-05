@@ -76,6 +76,7 @@
 
 {% block extra_js %}
 <script>
+    /*モーダルが開こうとした時の処理*/
     const deleteModal = document.getElementById('deleteModal');
     if (deleteModal) {
         deleteModal.addEventListener('show.bs.modal', function(event) {
@@ -86,9 +87,12 @@
             const shareId = item.getAttribute('data-share-id');
             const username = item.getAttribute('data-username');
 
-            /*モーダル内のテキストとフォームの送信先URLを書き換える*/
+            /*モーダル内のテキストを書き換える*/
             document.getElementById('modalTargetName').innerHTML = `<strong>${username}</strong>の<br>共有を解除しますか？`;
-            document.getElementById('deleteForm').action = `/share/delete/${shareId}`;
+            
+            /*末尾のID(0)だけ差し替える */
+            const baseUrl = "{% url 'reptile:share_delete' share_id=0 %}";
+            document.getElementById('deleteForm').action = baseUrl.replace('0', shareId);
         });
     }
 </script>

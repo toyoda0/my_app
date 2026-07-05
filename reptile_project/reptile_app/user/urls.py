@@ -17,4 +17,6 @@ urlpatterns = [
     path('settings/email/', views.email_change, name='email_change'),
     #設定画面
     path('settings/', views.settings_home, name='settings_home'),
+    #パスワード再設定メール送付完了
+    path('request_password_reset/done/', views.password_reset_done, name='password_reset_done'),
 ]
