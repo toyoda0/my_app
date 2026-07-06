@@ -1,4 +1,4 @@
-<!-- templates/portfolio/portfolio.html の中身 -->
+{% load static %}
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -10,9 +10,7 @@
         .document-link { font-size: 1.1rem; text-decoration: none; margin: 0 10px; }
         .document-link:hover { text-decoration: underline; }
         .app-screenshot {
-            background-color: #ededed; border: 1px solid #ccc;
-            min-height: 300px; display: flex; align-items: center; justify-content: center;
-            font-weight: bold; color: #666;
+            width: 100%;
         }
     </style>
 </head>
@@ -20,21 +18,31 @@
 
 <div class="container my-5 text-center" style="max-width: 900px; border: 1px solid #999; padding: 40px; background: white;">
     
-    <!-- 作品名 -->
+    {#作品名#}
     <h2 class="fw-bold mb-4">Reptinote（レプティノート）</h2>
 
-    <!-- スクショ画像が表示されるエリア -->
-    <div class="app-screenshot mb-4 rounded">
-        アプリのスクショ
+    {#スクショ画像#}
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm border" style="border-color: #ccc !important;">
+                <img src="{% static 'images/screenshot1.png' %}" class="img-fluid rounded" alt="カレンダー画面">
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card shadow-sm border" style="border-color: #ccc !important;">
+                <img src="{% static 'images/screenshot2.png' %}" class="img-fluid rounded" alt="お世話記録編集画面">
+            </div>
+        </div>
     </div>
 
-    <!-- アプリの簡単な説明 -->
+    {#アプリの説明#}
     <p class="text-start mx-auto mb-4 text-muted" style="max-width: 750px; line-height: 1.8;">
-        Reptinoteは、爬虫類のペットの体調管理やお世話の記録を家族やパートナーと共有できる飼育管理アプリです。
+        Reptinoteは、爬虫類のペットの体調管理やお世話の記録を家族やパートナーと共有できる飼育管理アプリです。<br>
         日々のお世話を記録し、大切なペットの健康をみんなで見守ることができます。
     </p>
 
-    <!-- 設計図のリンク -->
+    {#設計図のリンク#}
     <div class="mb-5">
         <a href="/static/docs/planning.pdf" target="_blank" class="document-link">企画書</a>
         <a href="/static/docs/ui_design.svg" target="_blank" class="document-link">画面設計図</a>
