@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -149,3 +150,15 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 #メール送信時はターミナルに表示
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+env = environ.Env()
+
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+
+# 👇 送信元を自分のGmailアドレスに統一する
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
