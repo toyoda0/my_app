@@ -149,9 +149,10 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 #メール送信時はターミナルに表示
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 env = environ.Env()
+environ.Env.read_env(env_file=os.path.join(BASE_DIR, '.env'))
 
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
@@ -160,5 +161,9 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 
-# 👇 送信元を自分のGmailアドレスに統一する
+#送信元を自分のGmailアドレスに統一する
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+import ssl
+if DEBUG:
+    ssl._create_default_https_context = ssl._create_unverified_context

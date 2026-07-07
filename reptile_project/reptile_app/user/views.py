@@ -11,6 +11,7 @@ from reptile.models import ReptileInvite, UserShare
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
 from .forms import EmailChangeForm
+from django.core.mail import send_mail
 
 
 
@@ -133,10 +134,19 @@ def request_password_reset(request):
         user.save()
         token = password_reset_token.token
         
-        #復活URLをプリント→これをユーザーにメールで送る
-        print(f"{request.scheme}://{request.get_host()}/Reptinote/user/reset_password/{token}/")
-        message = 'パスワードリセットトークンをお送りしました'
+        #復活URLの組み立て
+        reset_url = f"{request.scheme}://{request.get_host()}/Reptinote/user/reset_password/{token}/"
         
+        #メールを送信する
+        subject = "【Reptinote】パスワード再設定URLのご案内"
+        mail_message = f"以下のURLからパスワードの再設定を行ってください。\n\n{reset_url}"
+        from_email = None  # settings.pyのDEFAULT_FROM_EMAILが自動で使われます
+        recipient_list = [email]  # ユーザーが入力したアドレス宛てに送る
+        
+        #メール送信を実行
+        send_mail(subject, mail_message, from_email, recipient_list)
+        
+        message = 'パスワードリセットトークンをお送りしました'
         return redirect('user:password_reset_done')
     
     #最初に画面を開いた（GET）とき、またはエラーがあるときは元の入力画面を出す    
