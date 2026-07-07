@@ -5,7 +5,7 @@
 
     <h2 style="font-weight: bold; color: #212529; margin-bottom: 30px; font-size: 1.5rem; text-align: center;">ログイン</h2>
 
-    <form method="POST" style="margin-bottom: 20px;">
+    <form method="POST" style="margin-bottom: 20px;" onsubmit="this.querySelector('button[type=submit]').disabled = true;">
         {% csrf_token %}
 
         {# id名を固定し、文字と中身を中央寄せにするスタイルを追加 #}

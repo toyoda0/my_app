@@ -18,7 +18,7 @@
     </div>
     {% endif %}
 
-    <form method="POST" action="?token={{ token|default:'' }}" style="margin-bottom: 20px;">
+    <form method="POST" action="?token={{ token|default:'' }}" style="margin-bottom: 20px;" onsubmit="this.querySelector('button[type=submit]').disabled = true;">
         {% csrf_token %}
 
         <div id="django-form-container" style="text-align: center; margin-bottom: 25px; width: 100%;">
