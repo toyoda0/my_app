@@ -82,14 +82,6 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-dark">おわかれ日</label>
-                        <div class="form-control-container">
-                            <input type="{{ form.record_end_date.field.widget.input_type }}" name="record_end_date" class="form-control border-primary" value="{{ form.record_end_date.value|default:"" }}">
-                        </div>
-                        {% if form.record_end_date.errors %}<div class="text-danger small">{{ form.record_end_date.errors.0 }}</div>{% endif %}
-                    </div>
-
-                    <div class="mb-3">
                         <label class="form-label fw-bold text-dark">メモ <span class="text-muted small ms-1" style="font-size: 0.75rem;">(最大500文字)</span></label>
                         <div class="form-control-container">
                             <textarea name="memo" class="form-control border-primary">{{ form.memo.value|default:"" }}</textarea>
