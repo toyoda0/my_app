@@ -20,7 +20,7 @@
     <div class="card shadow-sm p-4 bg-white rounded-3 border-0">
         <h3 class="fw-bold text-primary mb-4 text-center">ペットの登録</h3>
 
-        <form method="POST">
+        <form method="POST" onsubmit="this.querySelector('button[type=submit]').disabled = true;">
             {% csrf_token %}
 
             <div class="row g-4">
@@ -29,7 +29,7 @@
                     <div class="mb-3">
                         <label class="form-label fw-bold text-dark">名前 <span class="text-danger small ms-1" style="font-size: 0.75rem;">必須</span></label>
                         <div class="form-control-container">
-                            <input type="{{ form.name.field.widget.input_type }}" name="name" class="form-control border-primary" value="{{ form.name.value|default:"" }}">
+                            <input type="{{ form.name.field.widget.input_type }}" name="name" class="form-control border-primary" value="{{ form.name.value|default:"" }}" placeholder="レオ">
                         </div>
                         {% if form.name.errors %}<div class="text-danger small">{{ form.name.errors.0 }}</div>{% endif %}
                     </div>
@@ -37,7 +37,7 @@
                     <div class="mb-3">
                         <label class="form-label fw-bold text-dark">種類 <span class="text-danger small ms-1" style="font-size: 0.75rem;">必須</span></label>
                         <div class="form-control-container">
-                            <input type="{{ form.species.field.widget.input_type }}" name="species" class="form-control border-primary" value="{{ form.species.value|default:"" }}">
+                            <input type="{{ form.species.field.widget.input_type }}" name="species" class="form-control border-primary" value="{{ form.species.value|default:"" }}" placeholder="レオパードゲッコー">
                         </div>
                         {% if form.species.errors %}<div class="text-danger small">{{ form.species.errors.0 }}</div>{% endif %}
                     </div>
@@ -45,7 +45,7 @@
                     <div class="mb-3">
                         <label class="form-label fw-bold text-dark">モルフ</label>
                         <div class="form-control-container">
-                            <input type="{{ form.morph.field.widget.input_type }}" name="morph" class="form-control border-primary" value="{{ form.morph.value|default:"" }}">
+                            <input type="{{ form.morph.field.widget.input_type }}" name="morph" class="form-control border-primary" value="{{ form.morph.value|default:"" }}" placeholder="マックスノー">
                         </div>
                         {% if form.morph.errors %}<div class="text-danger small">{{ form.morph.errors.0 }}</div>{% endif %}
                     </div>
@@ -68,15 +68,16 @@
                     <div class="mb-3">
                         <label class="form-label fw-bold text-dark">誕生日</label>
                         <div class="form-control-container">
-                            <input type="{{ form.birthday.field.widget.input_type }}" name="birthday" class="form-control border-primary" value="{{ form.birthday.value|default:"" }}">
+                            <input type="date" name="birthday" class="form-control border-primary date-picker-max" value="{{ form.birthday.value|default:"" }}">
                         </div>
                         {% if form.birthday.errors %}<div class="text-danger small">{{ form.birthday.errors.0 }}</div>{% endif %}
                     </div>
 
+
                     <div class="mb-3">
                         <label class="form-label fw-bold text-dark">お迎え日</label>
                         <div class="form-control-container">
-                            <input type="{{ form.adoption_date.field.widget.input_type }}" name="adoption_date" class="form-control border-primary" value="{{ form.adoption_date.value|default:"" }}">
+                            <input type="date" name="adoption_date" class="form-control border-primary date-picker-max" value="{{ form.adoption_date.value|default:"" }}">
                         </div>
                         {% if form.adoption_date.errors %}<div class="text-danger small">{{ form.adoption_date.errors.0 }}</div>{% endif %}
                     </div>
@@ -106,5 +107,15 @@
         </form>
     </div>
 </div>
+
+<!--未来の日付を選択不可能にする-->
+<script>
+    window.addEventListener('load', () => {
+        const today = new Date().toLocaleDateString('sv-SE');
+        document.querySelectorAll('.date-picker-max').forEach(input => {
+            input.max = today;
+        });
+    });
+</script>
 
 {% endblock %}
