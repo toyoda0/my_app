@@ -8,6 +8,15 @@
     <form method="POST" style="margin-bottom: 20px;" onsubmit="this.querySelector('button[type=submit]').disabled = true;">
         {% csrf_token %}
 
+        {#ログインエラーメッセージを赤文字で表示する設定#}
+        {% if login_form.non_field_errors %}
+            <div style="color: red; font-weight: bold; font-size: 1rem; text-align: center; margin-bottom: 20px; list-style: none; padding: 0;">
+                {% for error in login_form.non_field_errors %}
+                    <p style="margin: 0;">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         {# id名を固定し、文字と中身を中央寄せにするスタイルを追加 #}
         <div id="django-form-container" style="text-align: center; margin-bottom: 25px; width: 100%;">
             {{ login_form.as_p }}
@@ -32,8 +41,11 @@
 
 <script>
     window.addEventListener('DOMContentLoaded', () => {
+        //Djangoが自動生成したエラーメッセージ（ul.errorlist）を丸ごと赤色・中央寄せにして黒丸を消す
+        const errorLists = document.querySelectorAll('#django-form-container .errorlist');
+        errorLists.forEach(el => el.style = 'color: red; font-weight: bold; list-style: none; padding: 0; margin-bottom: 20px; text-align: center;');
         //各項目（pタグ）を完全に中央に集める
-        const paragraphs = document.querySelectorAll('#django-form-container p');
+        const paragraphs = document.querySelectorAll('#django-form-container > p');
         paragraphs.forEach(p => {
             p.style.display = 'flex';
             p.style.flexDirection = 'column';

@@ -72,8 +72,9 @@ class RecordForm(forms.ModelForm):
         widgets = {
             'weight': forms.NumberInput(attrs={
                 'class': 'form-control', #入力ボックスの横幅が広がる
-                'placeholder': '00.0'}),
-            'length': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '00.0'}),
+                'placeholder': '00.0',
+                'min': '0',}),
+            'length': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '00.0', 'min': '0',}),
             'food_type': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '餌の種類'}),
             'record_date': forms.DateInput(attrs={'type':'date', 'class':'form-control'}),
             #ペットの選択肢欄を綺麗な形にする
@@ -121,6 +122,8 @@ class RecordForm(forms.ModelForm):
             self.fields['reptile'].queryset = Reptile.objects.filter(
                 Q(user=user) | Q(user__in=shared_owners)
             )
+        
+        self.fields['reptile'].empty_label = None
             
         # 編集画面の時に、初期値を正しくチェックボックスやラジオボタンに反映させる処理
         if self.instance and self.instance.pk:

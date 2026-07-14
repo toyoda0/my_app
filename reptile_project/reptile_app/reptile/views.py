@@ -5,8 +5,7 @@ from django import forms
 import datetime, calendar
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from user.forms import UserCreationForm
-from django.contrib.auth import login
+from django.contrib import messages
 from django.db.models import Q
 
 #カレンダー画面
@@ -120,12 +119,13 @@ def record_add(request, year, month, day):
         if form.is_valid():
             #保存する前に日付を上書きしたいからデータベースへの保存はしないで
             record = form.save(commit=False)
-            #URLから取得した日付をセット(最優先)
-            record.record_date = selected_date
-            #フォームに上書きしたインスタンスをもう一度セットする
-            form.instance = record
-            #フォームの save(commit=True) を呼ぶことで、
-            #レコードの保存とお世話（RecordCare）の手動登録が同時に走る
+            weight = form.cleaned_data.get('weight')
+            length = form.cleaned_data.get('length')
+            #もし「体重がマイナス」または「体長がマイナス」だったら
+            if (weight is not None and weight < 0) or (length is not None and length < 0):
+                messages.error(request, "体重または体長にマイナスの値は入力できません。")
+                #保存処理に進まず、エラーメッセージを持たせたまま登録画面をもう一度表示
+                return render(request, 'reptile/record_form.html', {'form': form, 'selected_date': selected_date})
             form.save(commit=True)
             
             return redirect('reptile:calendar_home') #保存したらカレンダー画面に戻る
@@ -340,8 +340,10 @@ def invite_url_add(request):
 #共有しているメンバー一覧
 @login_required
 def member_list(request):
-    #自分がオーナーとして共有しているユーザー一覧を取得
-    shared_members = UserShare.objects.filter(owner_user=request.user)
+    #自分がオーナー、または自分がゲストのデータを両方取得
+    shared_members = UserShare.objects.filter(
+        Q(owner_user=request.user) | Q(shared_user=request.user)
+    )
     
     context = {
         'shared_members': shared_members

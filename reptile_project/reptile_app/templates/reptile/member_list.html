@@ -11,12 +11,20 @@
     background-color: #a5d6a7 !important;
     color: #2c3e50;
     font-weight: bold;
+}
+/*オーナーのみホバー・クリックできるように設定*/
+.member_item.is-owner {
     cursor: pointer;
     transition: background-color 0.2s, transform 0.1s;
 }
-.member_item:hover {
+.member_item.is-owner:hover {
     background-color: #81c784 !important;
     transform: scale(1.01);
+}
+/*ゲスト（閲覧のみ）はホバーを無効化*/
+.member_item.is-guest {
+    background-color: #c8e6c9 !important;
+    cursor: default;
 }
 /*モーダルのボタン調整*/
 .btn-cancel {
@@ -39,13 +47,28 @@
         <div class="d-flex flex-column gap-3">
 
             {% for share in shared_members %}
-                <div class="p-3 rounded-3 member_item shadow-sm d-flex justify-content-between align-items-center"
-                    data-bs-toggle="modal"
-                    data-bs-target="#deleteModal"
-                    data-share-id="{{ share.id }}"
-                    data-username="{{ share.shared_user.username }}">
-                    <span class="fs-5">{{ share.shared_user.username }}</span>
-                </div>
+                {#自分がオーナーの場合#}
+                {% if share.owner_user == request.user %}
+                    <div class="p-3 rounded-3 member_item is-owner shadow-sm d-flex justify-content-between align-items-center"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deleteModal"
+                        data-share-id="{{ share.id }}"
+                        data-username="{{ share.shared_user.username }}">
+                        
+                        <span class="fs-5">{{ share.shared_user.username }}</span>
+                        <!-- オーナー側から見て、相手はゲストだとわかるバッジ -->
+                        <span class="badge bg-secondary px-3 py-2 rounded-pill" style="font-size: 0.8rem;">ゲスト</span>
+                    </div>
+
+                {#自分がゲストの場合#}
+                {% else %}
+                    <!-- モーダル起動せず、is-guestクラスを適用してカーソル乗せても動かない -->
+                    <div class="p-3 rounded-3 member_item is-guest shadow-sm d-flex justify-content-between align-items-center">
+                        <span class="fs-5">{{ share.owner_user.username }}</span>
+                        <!-- 自分が共有してもらっているオーナーだとわかるバッジ -->
+                        <span class="badge bg-primary px-3 py-2 rounded-pill" style="font-size: 0.8rem;">オーナー</span>
+                    </div>
+                {% endif %}
             {% empty %}
                 <div class="text-muted text-center py-3">共有しているメンバーはいません</div>
             {% endfor %}
