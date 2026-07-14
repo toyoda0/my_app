@@ -17,7 +17,7 @@
         </div>
 
         <div class="d-flex flex-column align-items-center gap-3 mx-auto" style="max-width: 400px; text-align: center;">
-        <form method="POST" class="w-100">
+        <form method="POST" class="w-100" onsubmit="this.querySelector('button[type=submit]').disabled = true;">
             {% csrf_token %}
             <button type="submit" class="btn fw-bold w-100 py-2 shadow-sm text-dark" 
                 style="background-color: #c2c2c2 !important; border-color: #c2c2c2 !important; font-size: 1.1rem;">
@@ -31,9 +31,8 @@
             <p class="text-muted small">※このURLは一度誰かが登録すると使えなくなります。</p>
 
             <div class="input-group">
-                <input type="text" id="inviteUrl" class="form-control bg-white" value="{{ generated_url }}" readonly>
+                <input type="text" class="form-control bg-white" value="{{ generated_url }}" readonly>
             </div>
-            <span id="copyMessage" class="text-primary small d-block mt-2" style="display: none !important;">コピーしました</span>
         </div>
         {% endif %}
 
@@ -48,18 +47,4 @@
         
 </div>
 
-<script>
-function copyUrl() {
-    var copyText = document.getElementById("inviteUrl");
-    copyText.select();
-    copyText.setSelectionRange(0, 99999);
-    navigator.clipboard.writeText(copyText, value);
-
-    var msg = document.getElementById('copyMessage');
-    msg.style.setProperty("display", "block", "important");
-    setTimeout(function() {
-        msg.style.setProperty("display", "none", "important");
-    }, 2000);
-}
-</script>
 {% endblock %}

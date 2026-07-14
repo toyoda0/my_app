@@ -48,7 +48,7 @@
     <div class="card shadow-sm p-4 bg-white rounded">
         <h4 class="mb-4 text-center text-primary">お世話記録登録</h4>
          
-        <form method="POST" enctype="multipart/form-data">
+        <form method="POST" enctype="multipart/form-data" onsubmit="this.querySelector('button[type=submit]').disabled = true;">
 
 
 
@@ -208,11 +208,6 @@
                         style="background-color: #c2c2c2 !important; border-color: #c2c2c2 !important; min-width: 130px; height: 38px; text-decoration: none;">
                             キャンセル
                         </a>
-                        
-                        <button type="button" class="btn fw-bold text-dark d-inline-flex align-items-center justify-content-center" id="deleteModalTrigger"
-                                style="background-color: #ff9e9e !important; border-color: #ff9e9e !important; min-width: 130px; height: 38px;">
-                            削除
-                        </button>
                     </div>
                 </div>
             </div>
@@ -222,6 +217,11 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date().toLocaleDateString('sv-SE');
+        const dateInputs = document.querySelectorAll('.date-picker-max, input[type="date"]');
+        dateInputs.forEach(input => {
+            input.max = today;
+        });
         /*脱皮とフンのラジオボタンをもう一度クリックしたら選択解除できる*/
         ['shedding', 'feces'].forEach(name => {
             document.querySelectorAll(`input[name="${name}"]`).forEach(radio => {
