@@ -16,17 +16,17 @@
             </ul>
         </div>
 
-        <div class="text-center">
-        <form method="POST">
+        <div class="d-flex flex-column align-items-center gap-3 mx-auto" style="max-width: 400px; text-align: center;">
+        <form method="POST" class="w-100">
             {% csrf_token %}
             <button type="submit" class="btn fw-bold w-100 py-2 shadow-sm text-dark" 
-                style="background-color: #c2c2c2 !important; border-color: #c2c2c2 !important;">
+                style="background-color: #c2c2c2 !important; border-color: #c2c2c2 !important; font-size: 1.1rem;">
                 <i class="bi bi-link-45deg"></i>招待URLを作成する
             </button>
         </form>
 
         {% if generated_url %}
-        <div class="mt-4 p-3 rounded-3 border" style="background-color: #f8f9fa;">
+        <div class="p-3 rounded-3 border w-100" style="background-color: #f8f9fa; text-align: left;">
             <label class="form-label fw-bold text-primary small">作成された招待URL</label>
             <p class="text-muted small">※このURLは一度誰かが登録すると使えなくなります。</p>
 
@@ -37,13 +37,15 @@
         </div>
         {% endif %}
 
-        <div class="mt-4">
-            <a href="{% url 'user:settings_home' %}" class="text-secondary small text-decoration-underline fw-bold" style="transition: color 0.2s;">
+        <div class="w-100 mt-2">
+            <a href="{% url 'user:settings_home' %}" class="btn py-2 shadow-sm text-center text-decoration-none d-block fw-bold text-dark"
+                style="background-color: #c2c2c2 !important; border-color: #c2c2c2 !important; font-size: 1.1rem; width: 100%;">
                 キャンセル
             </a>
         </div>
         
     </div>
+        
 </div>
 
 <script>

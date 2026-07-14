@@ -22,11 +22,17 @@ STATIC_DIR = os.path.join(BASE_DIR, 'static')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
+
+env = environ.Env()
+environ.Env.read_env(env_file=os.path.join(BASE_DIR, '.env'))
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-@hn&7-yuyj+ypuf+%*b)mdh^xj6rhp1dm2ce*-2%wglv!crvj-'
+#シークレットキーを.envから読み込む
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+#自分のPCならTrue、PythonAnywhereなら自動でFalseに
+DEBUG = os.path.exists(os.path.join(BASE_DIR, 'db.sqlite3')) and 'toyoda.pythonanywhere.com' not in os.environ.get('HTTP_HOST', '')
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'toyoda.pythonanywhere.com']
 
@@ -148,12 +154,17 @@ LOGIN_REDIRECT_URL = 'calendar_home'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-#メール送信時はターミナルに表示
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-env = environ.Env()
-environ.Env.read_env(env_file=os.path.join(BASE_DIR, '.env'))
+if DEBUG:
+    #自分のPC（開発環境）では実際にGmailを送信する
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    import ssl
+    ssl._create_default_https_context = ssl._create_unverified_context
+else:
+    #PythonAnywhere（本番環境）では、外部接続エラーを防ぐために「ログ出力」に切り替える
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
+#Gmailの共通設定
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
@@ -161,9 +172,5 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 
-#送信元を自分のGmailアドレスに統一する
+# 送信元を自分のGmailアドレスに統一する
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
-import ssl
-if DEBUG:
-    ssl._create_default_https_context = ssl._create_unverified_context
