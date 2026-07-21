@@ -31,8 +31,7 @@ environ.Env.read_env(env_file=os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-#自分のPCならTrue、PythonAnywhereなら自動でFalseに
-DEBUG = os.path.exists(os.path.join(BASE_DIR, 'db.sqlite3')) and 'toyoda.pythonanywhere.com' not in os.environ.get('HTTP_HOST', '')
+DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'toyoda.pythonanywhere.com']
 
@@ -155,19 +154,11 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
-# Gmail送信設定（開発環境・本番環境どちらも実際にメールを送信する）
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = "smtp.gmail.com"
+
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
-
-# 送信元表示の設定
-DEFAULT_FROM_EMAIL = f'Reptinote <{EMAIL_HOST_USER}>'
-
-# 自分のPC（開発環境）で証明書エラーが出る場合の対策
-if DEBUG:
-    import ssl
-    ssl._create_default_https_context = ssl._create_unverified_context
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
