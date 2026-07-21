@@ -155,16 +155,8 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
-if DEBUG:
-    #自分のPC（開発環境）では実際にGmailを送信する
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    import ssl
-    ssl._create_default_https_context = ssl._create_unverified_context
-else:
-    #PythonAnywhere（本番環境）では、外部接続エラーを防ぐために「ログ出力」に切り替える
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-#Gmailの共通設定
+# Gmail送信設定（開発環境・本番環境どちらも実際にメールを送信する）
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
@@ -172,5 +164,10 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 
-# 送信元を自分のGmailアドレスに統一する
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+# 送信元表示の設定
+DEFAULT_FROM_EMAIL = f'Reptinote <{EMAIL_HOST_USER}>'
+
+# 自分のPC（開発環境）で証明書エラーが出る場合の対策
+if DEBUG:
+    import ssl
+    ssl._create_default_https_context = ssl._create_unverified_context

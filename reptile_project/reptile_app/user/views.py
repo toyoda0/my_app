@@ -129,9 +129,6 @@ def request_password_reset(request):
         password_reset_token.used = False
         password_reset_token.save()
             
-        #パスワード更新されるまで一時的にアカウント凍結
-        user.is_active = False
-        user.save()
         token = password_reset_token.token
         
         #復活URLの組み立て
@@ -167,6 +164,7 @@ def reset_password(request, token):
         user = password_reset_token.user
         password = form.cleaned_data['password1']
         validate_password(password)
+        
         # パスワード更新
         user.set_password(password)
         user.is_active = True
