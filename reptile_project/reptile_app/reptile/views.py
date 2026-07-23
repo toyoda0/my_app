@@ -199,8 +199,13 @@ def reptile_add(request):
 #ペット一覧
 @login_required
 def reptile_list(request):
-    #ログインしているユーザーが飼っているペットだけを一覧で取得
-    reptiles = Reptile.objects.filter(user=request.user)
+    # 自分がゲスト（共有されている側）の場合のオーナーIDリストを取得
+    shared_owner_ids = UserShare.objects.filter(shared_user=request.user).values_list('owner_user_id', flat=True)
+    
+    # 「自分のペット」または「共有されたオーナーのペット」をまとめて取得
+    reptiles = Reptile.objects.filter(
+        Q(user=request.user) | Q(user_id__in=shared_owner_ids)
+    ).distinct()
     
     return render(request, 'reptile/reptile_list.html', {'reptiles': reptiles})
     

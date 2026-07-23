@@ -222,19 +222,16 @@
 
             <div class="row mt-4">
                 <div class="col-12">
-                    <div class="d-flex justify-content-center align-items-center mt-5 gap-3">
-                        <button type="submit" class="btn fw-bold text-dark d-inline-flex align-items-center justify-content-center" 
-                                style="background-color: #89b2cc !important; border-color: #89b2cc !important; min-width: 130px; height: 38px;">
+                    <div class="d-flex justify-content-center align-items-center mt-4 gap-3 pt-3 border-top">
+                        <button type="submit" class="btn btn-app-submit">
                             更新
                         </button>
                         
-                        <a href="{% url 'reptile:calendar_home' %}" class="btn fw-bold text-dark d-inline-flex align-items-center justify-content-center" 
-                        style="background-color: #c2c2c2 !important; border-color: #c2c2c2 !important; min-width: 130px; height: 38px; text-decoration: none;">
+                        <a href="{% url 'reptile:calendar_home' %}" class="btn btn-app-cancel">
                             キャンセル
                         </a>
                         
-                        <button type="button" class="btn fw-bold text-dark d-inline-flex align-items-center justify-content-center" id="deleteModalTrigger"
-                                style="background-color: #fca5a5; color: black; border: none; width: 130px; height: 38px; border-radius: 4px;">
+                        <button type="button" class="btn btn-app-danger" id="deleteModalTrigger">
                             削除
                         </button>
                     </div>
@@ -254,12 +251,10 @@
         <form id="deleteForm" method="POST" action="{% url 'reptile:record_delete' record_id=form.instance.pk %}">
             {% csrf_token %}
             <div class="d-flex flex-column gap-3 align-items-center">
-                <button type="submit" class="btn px-4 py-2 border border-dark"
-                        style="background-color: #fca5a5; color: black; font-weight: bold; font-size: 1.1rem; width: 160px;">
+                <button type="submit" class="btn btn-app-danger w-100" style="max-width: 160px;">
                     削除
                 </button>
-                <button type="button" class="btn px-4 py-2 border border-dark" id="modalCancelBtn"
-                        style="background-color: #cccccc; color: black; font-weight: bold; font-size: 1.1rem; width: 160px;">
+                <button type="button" class="btn btn-app-cancel w-100" id="modalCancelBtn" style="max-width: 160px;">
                     キャンセル
                 </button>
             </div>
@@ -296,7 +291,7 @@
         /*写真を選択したらグレーの箱の中にプレビューを表示*/
         const imageInput = document.getElementById('id_image');
         const uploadBox = document.querySelector('.photo-upload-box');
-        const clearCheckbox = document.getElementById('image-clear_id');	
+        const clearCheckbox = document.getElementById('image-clear_id');    
         const deleteBtn = document.getElementById('delete-photo-btn');
         
         if (imageInput && uploadBox) {

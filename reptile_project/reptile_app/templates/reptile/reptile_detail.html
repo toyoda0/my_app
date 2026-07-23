@@ -71,13 +71,11 @@
         </div>
 
         <div class="d-flex justify-content-center gap-3 mt-4 pt-3 border-top">
-            <a href="{% url 'reptile:reptile_edit' record_id=reptile.id %}" class="btn btn-secondary py-2 fw-bold text-center" 
-               style="background-color: #89b2cc; border: none; color: black; width: 130px;">
+            <a href="{% url 'reptile:reptile_edit' record_id=reptile.id %}" class="btn btn-app-submit">
                 編集
             </a>
             
-            <a href="{% url 'reptile:reptile_list' %}" class="btn btn-secondary py-2 fw-bold text-center" 
-               style="background-color: #c2c2c2; border: none; color: black; width: 130px;">
+            <a href="{% url 'reptile:reptile_list' %}" class="btn btn-app-cancel">
                 戻る
             </a>
         </div>

@@ -105,43 +105,40 @@
                                 {# 今月の日付の時（0じゃない）に中身を書く #}
                                 {% if day.day_num > 0 %}
 
-                                    <a href="{% url 'reptile:record_add_with_date' year month day.day_num %}?pet_id={{ selected_pet_id }}" class="date-link">
-                                        <span class="p-2" style="align-self: flex-start;">{{ day.day_num }}</span>
-                                    </a>                                    
+                                    {% if day.record %}
+                                        <div class="date-link" style="cursor: pointer;"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#recordDetailModal"
+                                            {#JavaScriptに記録のIDを渡すためのデータ#}
+                                            data-id="{{ day.record.id }}"
+                                            {# data-date: 選択された日付を「YYYY/MM/DD」の形式でセット #}
+                                            data-date="{{ year }}/{{ month|stringformat:'02d' }}/{{ day.day_num|stringformat:'02d'}}"
+                                            {# data-pet-name: 登録されたペットの名前をそのまま入れる #}
+                                            data-pet-name="{{ day.record.reptile.name }}"
+                                            {# data-weight: 体重（入力がない時は「---」） #}
+                                            data-weight="{{ day.record.weight|default:'---'}}g"
+                                            {# data-length: 体長（入力がない時は「---」） #}
+                                            data-length="{{ day.record.length|default:'---' }}cm"
+                                            {# data-feeding: 給餌のあり・なし #}
+                                            data-feeding="{% if day.record.feeding %}あり{% else %}なし{% endif %}"
+                                            {# data-feces: フンの状態（0なら正常） #}
+                                            data-feces="{% if day.record.feces == 0 %}異常{% elif day.record.feces == 1 %}正常{% else %}なし{% endif %}"
+                                            {# data-shedding: 脱皮の状態 #}
+                                            data-shedding="{% if day.record.shedding == 0 %}白濁{% elif day.record.shedding == 1 %}脱皮{% else %}なし{% endif %}"
+                                            {# data-care: お世話内容 #}
+                                            data-care="{{ day.record.get_cares_text }}"
+                                            {# data-memo: メモ（入力がない時は「（メモなし）」） #}
+                                            data-memo="{{ day.record.memo|default:'(メモなし)' }}"
+                                            {# data-photo: 当日の写真画像（登録されていればそのURL） #}
+                                            data-photo="{% if day.record.image and day.record.image.name %}{{ day.record.image.url }}{% else %}{% endif %}"
+                                            data-condition-img="{% if day.record.condition == 0 %}{% static 'reptile/images/good.jpg' %}{% elif day.record.condition == 1 %}{% static 'reptile/images/normal.jpg' %}{% elif day.record.condition == 2 %}{% static 'reptile/images/bad.jpg' %}{% endif %}">
 
-                                    {# カレンダーの日付の中に顔マークを表示 #}
-                                    <div class="condition-image-area" 
-                                     style="position: absolute; bottom: 8px; left: 0; right: 0; display: flex; justify-content: center; z-index: 10;">
-                                        {% if day.record %}
-                                            {# 顔マークのボタンに仕込んだデータ JavaScriptが参照する #}
-                                            <button type="button" class="btn p-0 border-0 bg-transparent"
-                                                    style="display: block; width: 30px; height: 30px; cursor: pointer; outline: none;"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#recordDetailModal"
-                                                    {#JavaScriptに記録のIDを渡すためのデータ#}
-                                                    data-id="{{ day.record.id }}"
-                                                    {# data-date: 選択された日付を「YYYY/MM/DD」の形式でセット #}
-                                                    data-date="{{ year }}/{{ month|stringformat:'02d' }}/{{ day.day_num|stringformat:'02d'}}"
-                                                    {# data-pet-name: 登録されたペットの名前をそのまま入れる #}
-                                                    data-pet-name="{{ day.record.reptile.name }}"
-                                                    {# data-weight: 体重（入力がない時は「---」） #}
-                                                    data-weight="{{ day.record.weight|default:'---'}}g"
-                                                    {# data-feeding: 給餌のあり・なし #}
-                                                    data-feeding="{% if day.record.feeding %}あり{% else %}なし{% endif %}"
-                                                    {# data-feces: フンの状態（0なら正常） #}
-                                                    data-feces="{% if day.record.feces == 0 %}異常{% elif day.record.feces == 1 %}正常{% else %}なし{% endif %}"
-                                                    {# data-shedding: 脱皮の状態 #}
-                                                    data-shedding="{% if day.record.shedding == 0 %}白濁{% elif day.record.shedding == 1 %}脱皮{% else %}なし{% endif %}"
-                                                    {# data-care: お世話内容 #}
-                                                    data-care="{{ day.record.get_cares_text }}"
-                                                    {# data-memo: メモ（入力がない時は「（メモなし）」） #}
-                                                    data-memo="{{ day.record.memo|default:'(メモなし)' }}"
-                                                    {# data-photo: 当日の写真画像（登録されていればそのURL） #}
-                                                    data-photo="{% if day.record.image and day.record.image.name %}{{ day.record.image.url }}{% else %}{% endif %}"
-                                                    data-condition-img="{% if day.record.condition == 0 %}{% static 'reptile/images/good.jpg' %}{% elif day.record.condition == 1 %}{% static 'reptile/images/normal.jpg' %}{% elif day.record.condition == 2 %}{% static 'reptile/images/bad.jpg' %}{% endif %}">
+                                            {# 日付表示 #}
+                                            <span class="p-2" style="align-self: flex-start;">{{ day.day_num }}</span>
 
 
-                                                {# カレンダーに表示するボタン用 #}
+                                            {# 顔マーク表示 #}
+                                            <div class="condition-image-area mb-1">    
                                                 {% if day.record.condition == 0 %}
                                                     <img src="{% static 'reptile/images/good.jpg' %}" alt='元気' style="width: 30px; height: 30px; object-fit: contain; pointer-events: none;">
                                                 {% elif day.record.condition == 1 %}
@@ -149,11 +146,15 @@
                                                 {% elif day.record.condition == 2 %}
                                                     <img src="{% static 'reptile/images/bad.jpg' %}" alt='悪い' style="width: 30px; height: 30px; object-fit: contain; pointer-events: none;">
                                                 {% endif %}
-                                            </button>
-                                        {% endif %}
-                                    </div>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        {# 記録がない日：新規登録ページへ移動 #}
+                                        <a href="{% url 'reptile:record_add_with_date' year month day.day_num %}?pet_id={{ selected_pet_id }}" class="date-link">
+                                            <span class="p-2" style="align-self: flex-start;">{{ day.day_num }}</span>
+                                        </a>
+                                    {% endif %}
                                 {% endif %}
-
                             </td>
                         {% endfor %}
                     </tr>
@@ -179,6 +180,7 @@
                 <div class="text-start mx-auto" style="max-width: 280px;">
                     <p class="mb-2"><strong>日付:</strong> <span id="modalDate" class="ms-2 text-secondary"></span></p>
                     <p class="mb-2"><strong>体重:</strong> <span id="modalWeight" class="ms-2 text-secondary"></span></p>
+                    <p class="mb-2"><strong>体長:</strong> <span id="modalLength" class="ms-2 text-secondary"></span></p>
                     <p class="mb-2"><strong>給餌:</strong> <span id="modalFeeding" class="ms-2 text-secondary"></span></p>
                     <p class="mb-2"><strong>フン:</strong> <span id="modalfeces" class="ms-2 text-secondary"></span></p>
                     <p class="mb-2"><strong>脱皮:</strong> <span id="modalShedding" class="ms-2 text-secondary"></span></p>
@@ -219,6 +221,7 @@
             const date = button.getAttribute('data-date');
             const petName = button.getAttribute('data-pet-name');
             const weight = button.getAttribute('data-weight');
+            const length = button.getAttribute('data-length');
             const feeding = button.getAttribute('data-feeding');
             const feces = button.getAttribute('data-feces');
             const shedding = button.getAttribute('data-shedding');
@@ -231,6 +234,7 @@
             document.getElementById('modalPetName').textContent = petName + 'のお世話記録';
             document.getElementById('modalDate').textContent = date;
             document.getElementById('modalWeight').textContent = weight;
+            document.getElementById('modalLength').textContent = length;
             document.getElementById('modalFeeding').textContent = feeding;
             document.getElementById('modalfeces').textContent = feces;
             document.getElementById('modalShedding').textContent = shedding;
