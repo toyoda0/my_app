@@ -289,6 +289,9 @@ def reptile_edit(request, record_id):
         Q(id=record_id) & (Q(user=request.user) | Q(user_id__in=shared_owner_ids))
     )
     
+    #このペットの飼い主が自分ではない場合（＝共有されたペットを見ている場合）はゲストと判定
+    is_guest = (reptile.user != request.user)
+    
     if request.method == 'POST':
         #instance=reptileを渡して既存データの上書き保存
         form = ReptileForm(request.POST, instance=reptile)
@@ -303,6 +306,7 @@ def reptile_edit(request, record_id):
     context = {
         'form': form,
         'reptile': reptile,
+        'is_guest': is_guest,
     }
     return render(request, 'reptile/reptile_edit.html', context)
 
