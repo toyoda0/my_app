@@ -78,7 +78,7 @@ class RecordForm(forms.ModelForm):
             'food_type': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '餌の種類'}),
             'record_date': forms.DateInput(attrs={'type':'date', 'class':'form-control'}),
             #ペットの選択肢欄を綺麗な形にする
-            'reptile': forms.Select(attrs={'class': 'form-control'}),
+            'reptile': forms.Select(attrs={'class': 'form-select'}),
             'memo': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'image': forms.ClearableFileInput(attrs={'id': 'id_image'}),
         }
