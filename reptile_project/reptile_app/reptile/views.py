@@ -252,7 +252,7 @@ def record_edit(request, record_id):
             return redirect('reptile:calendar_home')
     else:
         #過去のデータが最初から入った状態のフォームを作る
-        form = RecordForm(instance=record)
+        form = RecordForm(instance=record, user=request.user)
         
     return render(request, 'reptile/record_edit.html', {'form': form, 'record':record})
 
