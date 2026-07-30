@@ -116,12 +116,13 @@ class RecordForm(forms.ModelForm):
         #もし user が渡されてきたら、選択肢をその人のペット（＋共有されたペット）だけに絞り込む
         if user:
             from reptile.models import Reptile, UserShare
-            # 自分がオーナーのペット、または自分に共有されているオーナーのペットのIDを集める
-            shared_owners = UserShare.objects.filter(shared_user=user).values_list('owner_user_id', flat=True)
+            # 自分とペア関係にある相手のID（オーナー側・ゲスト側どちらも）を取得
+            shares = UserShare.objects.filter(Q(owner_user=user) | Q(shared_user=user))
+            partner_ids = [s.shared_user_id if s.owner_user == user else s.owner_user_id for s in shares]
             # 自分のペット、または共有相手のペットだけをドロップダウンに出す
             self.fields['reptile'].queryset = Reptile.objects.filter(
-                Q(user=user) | Q(user__in=shared_owners)
-            )
+                Q(user=user) | Q(user_id__in=partner_ids)
+            ).distinct()
         
         self.fields['reptile'].empty_label = None
             
