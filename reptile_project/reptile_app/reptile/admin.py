@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Reptile, CareType, Record
+from .models import Reptile, CareType, Record, UserShare
 
 #爬虫類(生体)の管理画面設定
 @admin.register(Reptile)
@@ -22,4 +22,8 @@ class RecordAdmin(admin.ModelAdmin):
     list_display = ('record_date', 'reptile', 'condition', 'created_at')
     list_filter = ('condition', 'reptile', 'record_date')
 
-
+# ユーザー共有の管理画面設定
+@admin.register(UserShare)
+class UserShareAdmin(admin.ModelAdmin):
+    list_display = ('owner_user', 'shared_user', 'created_at')
+    list_filter = ('owner_user', 'shared_user')

@@ -8,6 +8,11 @@ from django.utils import timezone
 from django.contrib import messages
 from django.db.models import Q
 
+#自分がオーナーでもゲストでも、ペア相手のIDをすべて取得
+def get_partner_ids(user):
+    shares = UserShare.objects.filter(Q(owner_user=user) | Q(shared_user=user))
+    return [s.shared_user_id if s.owner_user == user else s.owner_user_id for s in shares]
+
 #カレンダー画面
 @login_required
 def calendar_home(request, year=None, month=None):
@@ -26,19 +31,19 @@ def calendar_home(request, year=None, month=None):
     cal = calendar.Calendar(firstweekday=6)
     month_days = cal.monthdayscalendar(current_year, current_month)
     
-    #自分が共有してもらっている相手（オーナー）のIDリストを取得
-    shared_owner_ids = UserShare.objects.filter(shared_user=request.user).values_list('owner_user_id', flat=True)
+    #自分とペアになっている相手全員のIDリスト
+    partner_ids = get_partner_ids(request.user)
     
     #自分のペット、または共有されたペットをまとめて取得
     user_reptiles = Reptile.objects.filter(
-        Q(user=request.user) | Q(user_id__in=shared_owner_ids)
+        Q(user=request.user) | Q(user_id__in=partner_ids)
     ).distinct()
     
     #デフォルトで表示するペット（1匹目）の選び方
     selected_pet_id = request.GET.get('pet_id')
     if not selected_pet_id and user_reptiles.exists():
         #自分がゲストなら「共有されたペット」を選ぶ
-        shared_reptiles = user_reptiles.filter(user_id__in=shared_owner_ids)
+        shared_reptiles = user_reptiles.filter(user_id__in=partner_ids)
         if shared_reptiles.exists():
             selected_pet_id = shared_reptiles.first().id
         else:
@@ -126,7 +131,7 @@ def record_add(request, year, month, day):
                 messages.error(request, "体重または体長にマイナスの値は入力できません。")
                 #保存処理に進まず、エラーメッセージを持たせたまま登録画面をもう一度表示
                 return render(request, 'reptile/record_form.html', {'form': form, 'selected_date': selected_date})
-            form.save(commit=True)
+            record.save()
             
             return redirect('reptile:calendar_home') #保存したらカレンダー画面に戻る
     else:        
@@ -199,12 +204,12 @@ def reptile_add(request):
 #ペット一覧
 @login_required
 def reptile_list(request):
-    # 自分がゲスト（共有されている側）の場合のオーナーIDリストを取得
-    shared_owner_ids = UserShare.objects.filter(shared_user=request.user).values_list('owner_user_id', flat=True)
+    #自分とペアになっている相手全員のIDリスト
+    partner_ids = get_partner_ids(request.user)
     
-    # 「自分のペット」または「共有されたオーナーのペット」をまとめて取得
+    # 「自分のペット」または「共有相手のペット」をまとめて取得
     reptiles = Reptile.objects.filter(
-        Q(user=request.user) | Q(user_id__in=shared_owner_ids)
+        Q(user=request.user) | Q(user_id__in=partner_ids)
     ).distinct()
     
     return render(request, 'reptile/reptile_list.html', {'reptiles': reptiles})
@@ -213,13 +218,13 @@ def reptile_list(request):
 #ペット詳細
 @login_required    
 def reptile_detail(request, record_id):
-    #自分がゲストの場合のオーナーIDリスト
-    shared_owner_ids = UserShare.objects.filter(shared_user=request.user).values_list('owner_user_id', flat=True)
+    #自分とペアになっている相手全員のIDリスト
+    partner_ids = get_partner_ids(request.user)
     
     #自分が飼い主(user)か、または共有してくれたオーナー(user_id__in)のペットなら取得OKにする
     reptile = get_object_or_404(
         Reptile,
-        Q(id=record_id) & (Q(user=request.user) | Q(user_id__in=shared_owner_ids))
+        Q(id=record_id) & (Q(user=request.user) | Q(user_id__in=partner_ids))
     )
     
     #性別の数字（0, 1, 2）を、モデルで定義した文字（不明, 男の子, 女の子）に変換する
@@ -235,13 +240,13 @@ def reptile_detail(request, record_id):
 #お世話記録の修正
 @login_required
 def record_edit(request, record_id):
-    # 自分がゲストの場合のオーナーIDリスト
-    shared_owner_ids = UserShare.objects.filter(shared_user=request.user).values_list('owner_user_id', flat=True)
+    #自分とペアになっている相手全員のIDリスト
+    partner_ids = get_partner_ids(request.user)
     
     #記録のペットの飼い主が、自分または共有オーナーなら編集OKにする
     record = get_object_or_404(
         Record, 
-        Q(id=record_id) & (Q(reptile__user=request.user) | Q(reptile__user_id__in=shared_owner_ids))
+        Q(id=record_id) & (Q(reptile__user=request.user) | Q(reptile__user_id__in=partner_ids))
     )
     
     if request.method == "POST":
@@ -260,13 +265,13 @@ def record_edit(request, record_id):
 #お世話記録の削除
 @login_required
 def record_delete(request, record_id):
-    # 自分がゲストの場合のオーナーIDリスト
-    shared_owner_ids = UserShare.objects.filter(shared_user=request.user).values_list('owner_user_id', flat=True)
+    #自分とペアになっている相手全員のIDリスト
+    partner_ids = get_partner_ids(request.user)
     
     #記録のペットの飼い主が、自分または共有オーナーなら安全に削除できるようにガード
     record = get_object_or_404(
         Record,
-        Q(id=record_id) & (Q(reptile__user=request.user) | Q(reptile__user_id__in=shared_owner_ids))
+        Q(id=record_id) & (Q(reptile__user=request.user) | Q(reptile__user_id__in=partner_ids))
     )
     
     if request.method == 'POST':
@@ -280,13 +285,13 @@ def record_delete(request, record_id):
 #ペットの詳細編集
 @login_required
 def reptile_edit(request, record_id):
-    #自分がゲストの場合のオーナーIDリスト
-    shared_owner_ids = UserShare.objects.filter(shared_user=request.user).values_list('owner_user_id', flat=True)
+    #自分とペアになっている相手全員のIDリスト
+    partner_ids = get_partner_ids(request.user)
     
     #他人に勝手に編集されないよう、自分または共有オーナーのペットのみ安全に取得
     reptile = get_object_or_404(
         Reptile,
-        Q(id=record_id) & (Q(user=request.user) | Q(user_id__in=shared_owner_ids))
+        Q(id=record_id) & (Q(user=request.user) | Q(user_id__in=partner_ids))
     )
     
     #このペットの飼い主が自分ではない場合（＝共有されたペットを見ている場合）はゲストと判定
