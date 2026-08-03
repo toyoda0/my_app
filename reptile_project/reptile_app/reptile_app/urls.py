@@ -12,8 +12,8 @@ urlpatterns = [
     path('', portfolio_views.portfolio_home, name='portfolio_home'),
 
     #「/Reptinote/〜」にアクセスが来たらマイアプリを動かす設定
-    path('Reptinote/', include('reptile.urls', namespace='reptile')), 
     path('Reptinote/user/', include('user.urls')), 
+    path('Reptinote/', include('reptile.urls', namespace='reptile')), 
 ]
 
 
