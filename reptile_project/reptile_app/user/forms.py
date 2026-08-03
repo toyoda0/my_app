@@ -96,6 +96,14 @@ class SetNewPasswordForm(forms.Form):
         if password1 and password2:
             if password1 != password2:
                 raise ValidationError('パスワードが一致しません')
+            
+            #文字数や安全基準のバリデーションチェックを追加
+            try:
+                validate_password(password1)
+            except ValidationError as e:
+                #文字数が足りない等のエラーをフォームのエラーとして登録する
+                self.add_error('password1', e)
+                
         else:
             raise ValidationError('パスワードを設定してください')
         return cleaned_data

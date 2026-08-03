@@ -156,8 +156,16 @@ def reset_password(request, token):
     password_reset_token = get_object_or_404(
         PasswordResetToken,
         token=token,
-        used=False,
     )
+    
+    #使用済みトークンのハンドリング
+    if password_reset_token.used:
+        messages.error(
+            request, 
+            'こちらのパスワード再設定URLはすでに使用されているか、有効期限が切れています。再度お手続きをお願いいたします。'
+        )
+        return redirect('user:request_password_reset')
+    
     form = forms.SetNewPasswordForm(request.POST or None)
     message = ''
     if form.is_valid():
