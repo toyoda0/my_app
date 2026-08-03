@@ -10,7 +10,7 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('index/', views.index, name='index'),
     path('request_password_reset/', views.request_password_reset, name='request_password_reset'),
-    path('reset_password/<str:token>/', views.reset_password, name='reset_password'),
+    path('reset_password/<uuid:token>/', views.reset_password, name='reset_password'),
     #パスワード変更(ログイン済)
     path('settings/password/', views.password_change, name='password_change'),
     #メールアドレス変更
