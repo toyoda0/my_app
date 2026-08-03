@@ -153,13 +153,10 @@ def request_password_reset(request):
 
 #復活URLからの新パスワード入力
 def reset_password(request, token):
-    password_reset_token = get_object_or_404(
-        PasswordResetToken,
-        token=token,
-    )
+    password_reset_token = PasswordResetToken.objects.filter(token=token).first()
     
-    #使用済みトークンのハンドリング
-    if password_reset_token.used:
+    # トークンが存在しない、または使用済みの場合はメッセージを出してリダイレクト
+    if not password_reset_token or password_reset_token.used:
         messages.error(
             request, 
             'こちらのパスワード再設定URLはすでに使用されているか、有効期限が切れています。再度お手続きをお願いいたします。'
