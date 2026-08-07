@@ -132,7 +132,7 @@ def record_add(request, year, month, day):
                 #保存処理に進まず、エラーメッセージを持たせたまま登録画面をもう一度表示
                 return render(request, 'reptile/record_form.html', {'form': form, 'selected_date': selected_date})
             record.save()
-            
+            messages.success(request, 'お世話記録を登録しました。')
             return redirect('reptile:calendar_home') #保存したらカレンダー画面に戻る
     else:        
         #URLの後ろについている「?pet_id=〇〇」からペットのIDを取得する

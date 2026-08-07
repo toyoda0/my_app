@@ -45,6 +45,16 @@
 {# カレンダー全体の土台 #}
 <div class="container mt-5" style="max-width: 900px;"> 
     <div class="card shadow-sm p-4 bg-white rounded-3 border-0"> 
+
+        {% if messages %}
+            <div class="mb-3">
+                {% for message in messages|slice:":1" %}
+                    <div class="alert alert-success text-center fw-bold mb-0 border-0" style="background-color: #d4edda; color: #2e7d32;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
         
         {# 年月とセレクトボックスを左右の端に #}
         <div class="d-flex justify-content-between align-items-center mb-4">
